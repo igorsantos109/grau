@@ -1,8 +1,8 @@
 target/
 Cargo.lock
-pkg/
 node_modules/
 dist/
+pkg/
 *.wasm
-*.js
-!src/**/*.js
+public/grau_web.js
+public/grau_web_bg.wasm
