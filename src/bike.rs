@@ -1,0 +1,192 @@
+//! Bike entity and components
+
+use nalgebra::{Vector3, UnitQuaternion};
+
+#[derive(Debug, Clone)]
+pub struct Transform {
+    pub position: Vector3<f32>,
+    pub rotation: UnitQuaternion<f32>,
+    pub scale: Vector3<f32>,
+}
+
+impl Default for Transform {
+    fn default() -> Self {
+        Self {
+            position: Vector3::new(0.0, 0.5, 0.0),
+            rotation: UnitQuaternion::identity(),
+            scale: Vector3::new(1.0, 1.0, 1.0),
+        }
+    }
+}
+
+impl Transform {
+    pub fn forward(&self) -> Vector3<f32> {
+        self.rotation * Vector3::new(0.0, 0.0, 1.0)
+    }
+    
+    pub fn right(&self) -> Vector3<f32> {
+        self.rotation * Vector3::new(1.0, 0.0, 0.0)
+    }
+    
+    pub fn up(&self) -> Vector3<f32> {
+        self.rotation * Vector3::new(0.0, 1.0, 0.0)
+    }
+    
+    pub fn euler_angles(&self) -> (f32, f32, f32) {
+        self.rotation.euler_angles()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Bike {
+    pub transform: Transform,
+    pub velocity: Vector3<f32>,
+    pub angular_velocity: Vector3<f32>,
+    pub accumulated_force: Vector3<f32>,
+    pub accumulated_torque: Vector3<f32>,
+    
+    // Input state
+    pub throttle: f32,
+    pub brake: f32,
+    pub steering_input: f32,
+    
+    // Physics properties
+    pub mass: f32,
+    pub wheelbase: f32,
+    
+    // State
+    pub speed: f32,
+    pub on_ground: bool,
+    pub is_wheelie_active: bool,
+    pub is_drift_active: bool,
+    pub wheelie_angle: f32,
+    pub drift_angle: f32,
+    
+    // Visual
+    pub lean_angle: f32,
+    pub wheel_rotation: f32,
+    
+    // Score/stats
+    pub wheelie_time: f32,
+    pub max_wheelie_angle: f32,
+    pub total_distance: f32,
+    pub best_wheelie_time: f32,
+    pub best_wheelie_angle: f32,
+}
+
+impl Default for Bike {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Bike {
+    pub fn new() -> Self {
+        Self {
+            transform: Transform::default(),
+            velocity: Vector3::zeros(),
+            angular_velocity: Vector3::zeros(),
+            accumulated_force: Vector3::zeros(),
+            accumulated_torque: Vector3::zeros(),
+            throttle: 0.0,
+            brake: 0.0,
+            steering_input: 0.0,
+            mass: 250.0,
+            wheelbase: 1.4,
+            speed: 0.0,
+            on_ground: true,
+            is_wheelie_active: false,
+            is_drift_active: false,
+            wheelie_angle: 0.0,
+            drift_angle: 0.0,
+            lean_angle: 0.0,
+            wheel_rotation: 0.0,
+            wheelie_time: 0.0,
+            max_wheelie_angle: 0.0,
+            total_distance: 0.0,
+            best_wheelie_time: 0.0,
+            best_wheelie_angle: 0.0,
+        }
+    }
+
+    pub fn apply_throttle(&mut self, value: f32) {
+        self.throttle = value.clamp(0.0, 1.0);
+    }
+
+    pub fn apply_brake(&mut self, value: f32) {
+        self.brake = value.clamp(0.0, 1.0);
+    }
+
+    pub fn apply_steering(&mut self, value: f32) {
+        self.steering_input = value.clamp(-1.0, 1.0);
+    }
+
+    pub fn start_wheelie(&mut self) {
+        if self.on_ground && self.speed > 5.0 {
+            self.is_wheelie_active = true;
+        }
+    }
+
+    pub fn stop_wheelie(&mut self) {
+        self.is_wheelie_active = false;
+    }
+
+    pub fn start_drift(&mut self) {
+        if self.on_ground && self.speed > 10.0 {
+            self.is_drift_active = true;
+        }
+    }
+
+    pub fn stop_drift(&mut self) {
+        self.is_drift_active = false;
+    }
+
+    pub fn add_force(&mut self, force: Vector3<f32>) {
+        self.accumulated_force += force;
+    }
+
+    pub fn add_torque(&mut self, torque: Vector3<f32>) {
+        self.accumulated_torque += torque;
+    }
+
+    pub fn update_state(&mut self, dt: f32) {
+        // Update wheelie angle from pitch
+        let (pitch, _, _) = self.transform.euler_angles();
+        self.wheelie_angle = pitch.to_degrees().abs();
+        
+        if self.is_wheelie_active {
+            self.wheelie_time += dt;
+            self.max_wheelie_angle = self.max_wheelie_angle.max(self.wheelie_angle);
+            self.best_wheelie_time = self.best_wheelie_time.max(self.wheelie_time);
+            self.best_wheelie_angle = self.best_wheelie_angle.max(self.max_wheelie_angle);
+        } else {
+            self.wheelie_time = 0.0;
+            self.max_wheelie_angle = 0.0;
+        }
+
+        // Update lean angle for visual
+        let (_, _, roll) = self.transform.euler_angles();
+        self.lean_angle = roll.to_degrees();
+
+        // Wheel rotation
+        self.wheel_rotation += self.speed * dt * 10.0;
+
+        // Distance
+        self.total_distance += self.speed * dt;
+    }
+
+    pub fn reset(&mut self) {
+        *self = Self::new();
+    }
+
+    pub fn get_wheel_positions(&self) -> (Vector3<f32>, Vector3<f32>) {
+        let front_offset = self.transform.forward() * (self.wheelbase / 2.0);
+        let rear_offset = -self.transform.forward() * (self.wheelbase / 2.0);
+        let up_offset = Vector3::new(0.0, 0.35, 0.0); // wheel radius
+        
+        let front = self.transform.position + front_offset - up_offset;
+        let rear = self.transform.position + rear_offset - up_offset;
+        
+        (front, rear)
+    }
+}

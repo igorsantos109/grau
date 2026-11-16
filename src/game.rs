@@ -1,0 +1,255 @@
+//! Core game loop and state management
+
+use crate::physics::PhysicsEngine;
+use crate::renderer::Renderer;
+use crate::input::InputManager;
+use crate::audio::AudioManager;
+use crate::bike::Bike;
+use crate::camera::Camera;
+use crate::ui::UI;
+use web_sys::{window, HtmlCanvasElement};
+use std::cell::RefCell;
+use std::rc::Rc;
+use js_sys::Date;
+use wasm_bindgen::prelude::Closure;
+use wasm_bindgen::JsCast;
+
+pub struct Game {
+    physics: PhysicsEngine,
+    renderer: Renderer,
+    input: InputManager,
+    audio: AudioManager,
+    bike: Bike,
+    camera: Camera,
+    ui: UI,
+    last_time: f64,
+    running: bool,
+    frame_count: u64,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        web_sys::console::log_1(&"[GRAU] Game::new() start".into());
+        let window = window().expect("no global window");
+        let document = window.document().expect("no document");
+        web_sys::console::log_1(&"[GRAU] Getting canvas...".into());
+        let canvas = document.get_element_by_id("game-canvas")
+            .expect("canvas not found")
+            .dyn_into::<HtmlCanvasElement>()
+            .expect("not a canvas");
+        web_sys::console::log_1(&"[GRAU] Canvas found".into());
+
+        // Set canvas size to match display size
+        let width = window.inner_width().unwrap().as_f64().unwrap() as u32;
+        let height = window.inner_height().unwrap().as_f64().unwrap() as u32;
+        canvas.set_width(width.max(1));
+        canvas.set_height(height.max(1));
+        web_sys::console::log_1(&format!("[GRAU] Canvas sized: {}x{}", width, height).into());
+
+        web_sys::console::log_1(&"[GRAU] Creating renderer...".into());
+        let renderer = Renderer::new(&canvas).unwrap_or_else(|e| {
+            web_sys::console::error_1(&format!("[GRAU] Renderer failed: {:?}", e).into());
+            panic!("failed to create renderer: {:?}", e);
+        });
+        web_sys::console::log_1(&"[GRAU] Renderer OK".into());
+        
+        let physics = PhysicsEngine::new();
+        web_sys::console::log_1(&"[GRAU] Creating input...".into());
+        let input = InputManager::new(&window);
+        web_sys::console::log_1(&"[GRAU] Input OK".into());
+        let audio = AudioManager::new();
+        let bike = Bike::new();
+        let camera = Camera::new();
+        web_sys::console::log_1(&"[GRAU] Creating UI...".into());
+        let ui = UI::new(&document);
+        web_sys::console::log_1(&"[GRAU] UI OK".into());
+
+        Self {
+            physics,
+            renderer,
+            input,
+            audio,
+            bike,
+            camera,
+            ui,
+            last_time: Date::now(),
+            running: true,
+            frame_count: 0,
+        }
+    }
+
+    pub fn run(mut self) {
+        web_sys::console::log_1(&"[GRAU] Game::run() - scheduling first frame".into());
+        let window = web_sys::window().expect("no global window");
+        
+        // Leak self to get a stable pointer for the closure
+        let game_ptr = Box::leak(Box::new(self)) as *mut Self;
+        
+        let closure = Closure::wrap(Box::new(move || {
+            unsafe {
+                (*game_ptr).tick();
+            }
+        }) as Box<dyn FnMut()>);
+
+        match window.request_animation_frame(closure.as_ref().unchecked_ref()) {
+            Ok(_) => web_sys::console::log_1(&"[GRAU] First frame scheduled".into()),
+            Err(e) => web_sys::console::error_1(&format!("[GRAU] RAF failed: {:?}", e).into()),
+        }
+        closure.forget();
+    }
+
+    fn tick(&mut self) {
+        if !self.running {
+            return;
+        }
+
+        if self.frame_count == 0 {
+            web_sys::console::log_1(&"[GRAU] First tick!".into());
+        }
+        if self.frame_count == 1 {
+            web_sys::console::log_1(&"[GRAU] Second tick!".into());
+        }
+
+        let window = web_sys::window().expect("no global window");
+        
+        // Update canvas size on resize
+        let doc = window.document().expect("no document");
+        if let Some(canvas_el) = doc.get_element_by_id("game-canvas") {
+            if let Ok(canvas) = canvas_el.dyn_into::<HtmlCanvasElement>() {
+                let w = window.inner_width().ok().and_then(|v| v.as_f64()).unwrap_or(800.0) as u32;
+                let h = window.inner_height().ok().and_then(|v| v.as_f64()).unwrap_or(600.0) as u32;
+                if canvas.width() != w || canvas.height() != h {
+                    canvas.set_width(w.max(1));
+                    canvas.set_height(h.max(1));
+                }
+            }
+        }
+        
+        let now = Date::now();
+        let dt = (now - self.last_time) / 1000.0;
+        self.last_time = now;
+        let dt = dt.clamp(0.0, 1.0 / 30.0);
+
+        if self.frame_count < 3 {
+            web_sys::console::log_1(&format!("[GRAU] tick #{}, dt={:.4}", self.frame_count, dt).into());
+        }
+
+        self.update(dt);
+        self.render();
+
+        self.frame_count += 1;
+        if self.frame_count % 60 == 0 {
+            self.ui.update_fps((1.0 / dt.max(0.001)) as f32);
+        }
+
+        // Schedule next frame - use the Rc pattern correctly
+        let game_ptr = self as *mut Self;
+        let closure = Closure::wrap(Box::new(move || {
+            unsafe {
+                (*game_ptr).tick();
+            }
+        }) as Box<dyn FnMut()>);
+
+        let _ = window.request_animation_frame(closure.as_ref().unchecked_ref());
+        closure.forget();
+    }
+
+    fn update(&mut self, dt: f64) {
+        // Update input
+        self.input.update();
+
+        // Handle game controls
+        self.handle_input(dt);
+
+        // Update physics
+        self.physics.update(&mut self.bike, dt as f32, &self.input);
+
+        // Update camera
+        self.camera.update(&self.bike, dt as f32);
+
+        // Update audio
+        self.audio.update(&self.bike);
+
+        // Update UI
+        self.ui.update(&self.bike, &self.camera);
+    }
+
+    fn handle_input(&mut self, dt: f64) {
+        let input = &self.input;
+
+        // Acceleration
+        if input.is_key_pressed("ArrowUp") || input.is_key_pressed("KeyW") {
+            self.bike.apply_throttle(1.0);
+        } else if input.is_key_pressed("ArrowDown") || input.is_key_pressed("KeyS") {
+            self.bike.apply_brake(1.0);
+        } else {
+            self.bike.apply_throttle(0.0);
+        }
+
+        // Steering
+        if input.is_key_pressed("ArrowLeft") || input.is_key_pressed("KeyA") {
+            self.bike.apply_steering(-1.0);
+        } else if input.is_key_pressed("ArrowRight") || input.is_key_pressed("KeyD") {
+            self.bike.apply_steering(1.0);
+        } else {
+            self.bike.apply_steering(0.0);
+        }
+
+        // Wheelie control (Space or Shift)
+        if input.is_key_pressed("Space") || input.is_key_pressed("ShiftLeft") {
+            self.bike.start_wheelie();
+        } else {
+            self.bike.stop_wheelie();
+        }
+
+        // Drift (Control)
+        if input.is_key_pressed("ControlLeft") || input.is_key_pressed("ControlRight") {
+            self.bike.start_drift();
+        } else {
+            self.bike.stop_drift();
+        }
+
+        // Camera toggle (C)
+        if input.was_key_just_pressed("KeyC") {
+            self.camera.toggle_mode();
+        }
+
+        // Reset (R)
+        if input.was_key_just_pressed("KeyR") {
+            self.bike.reset();
+        }
+
+        // Touch/mobile input handling
+        if let Some(touch) = input.get_touch_state() {
+            self.handle_touch_input(touch);
+        }
+    }
+
+    fn handle_touch_input(&mut self, touch: crate::input::TouchState) {
+        // Left side of screen - steering
+        if touch.x < 0.5 {
+            self.bike.apply_steering((touch.x - 0.25) * 4.0);
+        }
+        // Right side - throttle/brake
+        if touch.x > 0.5 {
+            if touch.y < 0.5 {
+                self.bike.apply_throttle(1.0 - touch.y * 2.0);
+            } else {
+                self.bike.apply_brake((touch.y - 0.5) * 2.0);
+            }
+        }
+        // Wheelie button area (bottom right)
+        if touch.x > 0.7 && touch.y > 0.7 {
+            self.bike.start_wheelie();
+        } else {
+            self.bike.stop_wheelie();
+        }
+    }
+
+    fn render(&mut self) {
+        self.renderer.begin_frame();
+        self.renderer.render_scene(&self.bike, &self.camera);
+        self.renderer.render_ui(&mut self.ui);
+        self.renderer.end_frame();
+    }
+}
