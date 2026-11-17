@@ -1,6 +1,6 @@
 //! Input management for keyboard, mouse, and touch
 
-use web_sys::{Window, KeyboardEvent, TouchEvent, MouseEvent, HtmlCanvasElement, HtmlElement, Element};
+use web_sys::{Window, KeyboardEvent, TouchEvent, MouseEvent, Element};
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -11,6 +11,7 @@ use wasm_bindgen::prelude::Closure;
 pub struct TouchState {
     pub x: f32,      // Normalized 0.0 - 1.0
     pub y: f32,      // Normalized 0.0 - 1.0
+    #[allow(dead_code)]
     pub active: bool,
 }
 
@@ -20,7 +21,9 @@ pub struct InputManager {
     keys_just_pressed: Rc<RefCell<HashMap<String, bool>>>,
     keys_just_released: Rc<RefCell<HashMap<String, bool>>>,
     touch_state: Rc<RefCell<Option<TouchState>>>,
+    #[allow(dead_code)]
     mouse_position: Rc<RefCell<(f32, f32)>>,
+    #[allow(dead_code)]
     mouse_buttons: Rc<RefCell<HashMap<i16, bool>>>,
 }
 
@@ -191,6 +194,7 @@ impl InputManager {
         *self.keys_just_pressed.borrow().get(code).unwrap_or(&false)
     }
 
+    #[allow(dead_code)]
     pub fn was_key_just_released(&self, code: &str) -> bool {
         *self.keys_just_released.borrow().get(code).unwrap_or(&false)
     }
@@ -199,10 +203,12 @@ impl InputManager {
         *self.touch_state.borrow()
     }
 
+    #[allow(dead_code)]
     pub fn get_mouse_position(&self) -> (f32, f32) {
         *self.mouse_position.borrow()
     }
 
+    #[allow(dead_code)]
     pub fn is_mouse_button_pressed(&self, button: i16) -> bool {
         *self.mouse_buttons.borrow().get(&button).unwrap_or(&false)
     }

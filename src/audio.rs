@@ -1,7 +1,7 @@
 //! Audio system using Web Audio API - Simplified version
 
 use crate::bike::Bike;
-use web_sys::{AudioContext, GainNode, OscillatorNode, OscillatorType, AudioNode, AudioDestinationNode, AudioParam};
+use web_sys::{AudioContext, GainNode, OscillatorNode, OscillatorType};
 
 pub struct AudioManager {
     context: Option<AudioContext>,
@@ -179,14 +179,17 @@ impl AudioManager {
         }
     }
 
+    #[allow(dead_code)]
     pub fn play_wheelie_sound(&mut self) {
-        // Could play a specific sound effect for wheelie start
+        // Efeito sonoro de início de grau (a implementar)
     }
 
+    #[allow(dead_code)]
     pub fn play_crash_sound(&mut self) {
-        // Could play crash sound
+        // Efeito sonoro de queda (a implementar)
     }
 
+    #[allow(dead_code)]
     pub fn set_master_volume(&mut self, volume: f32) {
         if let Some(gain) = &self.master_gain {
             let gain_param = gain.gain();

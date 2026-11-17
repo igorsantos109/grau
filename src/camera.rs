@@ -161,6 +161,8 @@ impl Camera {
         };
     }
 
+    /// Aplica camera shake (usado em impactos/queda). Mantido para game feel futuro.
+    #[allow(dead_code)]
     pub fn add_shake(&mut self, intensity: f32, duration: f32) {
         self.shake_intensity = intensity;
         self.shake_timer = duration;

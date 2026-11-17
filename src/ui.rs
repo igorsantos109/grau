@@ -2,7 +2,7 @@
 
 use crate::bike::Bike;
 use crate::camera::Camera;
-use web_sys::{Document, Element, HtmlElement, HtmlDivElement, HtmlSpanElement, window, KeyboardEvent};
+use web_sys::{Document, HtmlElement, window, KeyboardEvent};
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::Closure;
 
@@ -28,6 +28,7 @@ pub struct UI {
     start_overlay: Option<HtmlElement>,
     pause_overlay: Option<HtmlElement>,
     on_start: Option<Closure<dyn FnMut(web_sys::MouseEvent)>>,
+    #[allow(dead_code)]
     show_help: bool,
 }
 
@@ -349,6 +350,7 @@ impl UI {
     }
 
     /// Esconde a tela inicial (após o clique em JOGAR).
+    #[allow(dead_code)]
     pub fn hide_start(&mut self) {
         if let Some(overlay) = &self.start_overlay {
             overlay.set_class_name("help-overlay hidden");

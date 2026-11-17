@@ -11,6 +11,7 @@ pub struct PhysicsEngine {
 }
 
 #[derive(Clone, Copy)]
+#[allow(dead_code)] // vários parâmetros são mantidos para calibração futura da física
 pub struct BikePhysicsConfig {
     // Wheelie physics
     pub wheelie_torque: f32,
@@ -99,7 +100,7 @@ impl PhysicsEngine {
         }
     }
 
-    pub fn update(&mut self, bike: &mut Bike, dt: f32, input: &InputManager) {
+    pub fn update(&mut self, bike: &mut Bike, dt: f32, _input: &InputManager) {
         // Apply forces
         self.apply_engine_forces(bike, dt);
         self.apply_steering(bike, dt);
@@ -119,7 +120,7 @@ impl PhysicsEngine {
         bike.update_state(dt);
     }
 
-    fn apply_engine_forces(&self, bike: &mut Bike, dt: f32) {
+    fn apply_engine_forces(&self, bike: &mut Bike, _dt: f32) {
         let forward = bike.transform.rotation * Vector3::new(0.0, 0.0, 1.0);
         
         // Throttle
@@ -156,7 +157,7 @@ impl PhysicsEngine {
         }
     }
 
-    fn apply_wheelie_physics(&self, bike: &mut Bike, dt: f32) {
+    fn apply_wheelie_physics(&self, bike: &mut Bike, _dt: f32) {
         if !bike.is_wheelie_active {
             return;
         }
@@ -209,7 +210,7 @@ impl PhysicsEngine {
         }
 
         let velocity_dir = velocity.normalize();
-        let drift_angle = velocity_dir.dot(&right).abs();
+        let _drift_angle = velocity_dir.dot(&right).abs();
 
         // Sideways force for drift
         let sideways_force = right * self.config.drift_sideways_force * bike.steering_input.signum() * dt;

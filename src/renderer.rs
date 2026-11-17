@@ -4,7 +4,7 @@ use crate::bike::Bike;
 use crate::camera::Camera;
 use crate::ui::UI;
 use web_sys::{WebGl2RenderingContext, HtmlCanvasElement, WebGlProgram, WebGlShader, WebGlUniformLocation, WebGlVertexArrayObject};
-use nalgebra::{Matrix4, Vector3, Point3};
+use nalgebra::{Matrix4, Vector3};
 use std::rc::Rc;
 use js_sys::Float32Array;
 use wasm_bindgen::JsCast;

@@ -8,8 +8,6 @@ use crate::bike::Bike;
 use crate::camera::Camera;
 use crate::ui::UI;
 use web_sys::{window, HtmlCanvasElement};
-use std::cell::RefCell;
-use std::rc::Rc;
 use js_sys::Date;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::JsCast;
@@ -111,7 +109,7 @@ impl Game {
         }
     }
 
-    pub fn run(mut self) {
+    pub fn run(self) {
         web_sys::console::log_1(&"[GRAU] Game::run() - scheduling first frame".into());
         let window = web_sys::window().expect("no global window");
         
@@ -269,7 +267,7 @@ impl Game {
         self.camera.update(&self.bike, dt as f32);
     }
 
-    fn handle_input(&mut self, dt: f64) {
+    fn handle_input(&mut self, _dt: f64) {
         let input = &self.input;
 
         // Acceleration

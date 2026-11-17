@@ -6,6 +6,7 @@ use nalgebra::{Vector3, UnitQuaternion};
 pub struct Transform {
     pub position: Vector3<f32>,
     pub rotation: UnitQuaternion<f32>,
+    #[allow(dead_code)]
     pub scale: Vector3<f32>,
 }
 
@@ -60,6 +61,7 @@ pub struct Bike {
     pub is_wheelie_active: bool,
     pub is_drift_active: bool,
     pub wheelie_angle: f32,
+    #[allow(dead_code)]
     pub drift_angle: f32,
     
     // Visual
@@ -74,6 +76,7 @@ pub struct Bike {
     pub best_wheelie_angle: f32,
 
     // Dano visual/funcional (0 = novo, 1 = destruído)
+    #[allow(dead_code)]
     pub damage: f32,
     // Se a moto tombou (queda) — usado para reset suave
     pub fallen: bool,
@@ -192,6 +195,7 @@ impl Bike {
     }
 
     /// Aplica dano e marca tombo se necessário. Retorna true se acabou de tombar.
+    #[allow(dead_code)]
     pub fn apply_damage(&mut self, amount: f32) -> bool {
         self.damage = (self.damage + amount).clamp(0.0, 1.0);
         if self.damage >= 1.0 && !self.fallen {
