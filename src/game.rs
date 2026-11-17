@@ -24,6 +24,7 @@ pub struct Game {
     ui: UI,
     last_time: f64,
     running: bool,
+    paused: bool,
     frame_count: u64,
 }
 
@@ -57,12 +58,29 @@ impl Game {
         web_sys::console::log_1(&"[GRAU] Creating input...".into());
         let input = InputManager::new(&window);
         web_sys::console::log_1(&"[GRAU] Input OK".into());
-        let audio = AudioManager::new();
-        let bike = Bike::new();
+        let mut audio = AudioManager::new();
+        let mut bike = Bike::new();
+        // Carrega recordes persistidos (localStorage) ao iniciar
+        bike.load_records();
         let camera = Camera::new();
         web_sys::console::log_1(&"[GRAU] Creating UI...".into());
         let ui = UI::new(&document);
         web_sys::console::log_1(&"[GRAU] UI OK".into());
+
+        // Áudio só inicia após gesto do usuário: ouvimos o evento customizado
+        // "grau-start" disparado pelo botão JOGAR da tela inicial.
+        {
+            let audio_ptr = &mut audio as *mut AudioManager;
+            let closure = Closure::wrap(Box::new(move |_: web_sys::Event| {
+                unsafe {
+                    (*audio_ptr).init();
+                    (*audio_ptr).ensure_running();
+                }
+                web_sys::console::log_1(&"[GRAU] Áudio inicializado via gesto do usuário".into());
+            }) as Box<dyn FnMut(web_sys::Event)>);
+            window.add_event_listener_with_callback("grau-start", closure.as_ref().unchecked_ref()).ok();
+            closure.forget();
+        }
 
         Self {
             physics,
@@ -74,6 +92,7 @@ impl Game {
             ui,
             last_time: Date::now(),
             running: true,
+            paused: false,
             frame_count: 0,
         }
     }
@@ -155,8 +174,19 @@ impl Game {
     }
 
     fn update(&mut self, dt: f64) {
-        // Update input
+        // Update input (sempre, para detectar ESC/P mesmo pausado)
         self.input.update();
+
+        // Toggle de pausa
+        if self.input.was_key_just_pressed("Escape") || self.input.was_key_just_pressed("KeyP") {
+            self.paused = !self.paused;
+            self.ui.set_paused(self.paused);
+            web_sys::console::log_1(&format!("[GRAU] Pausa: {}", self.paused).into());
+        }
+
+        if self.paused {
+            return; // congela física/câmera, mas segue renderizando e leggando input
+        }
 
         // Handle game controls
         self.handle_input(dt);
@@ -170,8 +200,15 @@ impl Game {
         // Update audio
         self.audio.update(&self.bike);
 
-        // Update UI
+        // Reset suave automático quando a moto tomba (fallen) — salva recordes antes
+        if self.bike.fallen {
+            self.bike.save_records();
+            self.bike.reset();
+        }
+
+        // Update UI (HUD + barras de input)
         self.ui.update(&self.bike, &self.camera);
+        self.ui.update_dom(&self.bike);
     }
 
     fn handle_input(&mut self, dt: f64) {
@@ -214,8 +251,9 @@ impl Game {
             self.camera.toggle_mode();
         }
 
-        // Reset (R)
+        // Reset (R) — salva recordes antes de resetar
         if input.was_key_just_pressed("KeyR") {
+            self.bike.save_records();
             self.bike.reset();
         }
 
@@ -249,7 +287,7 @@ impl Game {
     fn render(&mut self) {
         self.renderer.begin_frame();
         self.renderer.render_scene(&self.bike, &self.camera);
-        self.renderer.render_ui(&mut self.ui);
+        self.renderer.render_ui(&mut self.ui, &self.bike);
         self.renderer.end_frame();
     }
 }

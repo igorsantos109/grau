@@ -25,6 +25,9 @@ pub struct UI {
     brake_bar: Option<HtmlElement>,
     steering_bar: Option<HtmlElement>,
     help_overlay: Option<HtmlElement>,
+    start_overlay: Option<HtmlElement>,
+    pause_overlay: Option<HtmlElement>,
+    on_start: Option<Closure<dyn FnMut(web_sys::MouseEvent)>>,
     show_help: bool,
 }
 
@@ -49,6 +52,9 @@ impl UI {
             brake_bar: None,
             steering_bar: None,
             help_overlay: None,
+            start_overlay: None,
+            pause_overlay: None,
+            on_start: None,
             show_help: true,
         };
         
@@ -132,10 +138,46 @@ impl UI {
         "#);
         body.append_child(&indicators).unwrap();
 
+        // Overlay de pausa
+        let pause = self.document.create_element("div").unwrap();
+        pause.set_id("pause-overlay");
+        pause.set_class_name("help-overlay hidden");
+        pause.set_inner_html(r#"
+            <div class="help-content">
+                <h2>PAUSADO</h2>
+                <div class="subtitle">Pressione ESC ou P para continuar</div>
+            </div>
+        "#);
+        body.append_child(&pause).unwrap();
+
+        // Tela inicial (start screen): botão JOGAR que inicializa áudio via gesto do usuário
+        let start = self.document.create_element("div").unwrap();
+        start.set_id("start-overlay");
+        start.set_class_name("help-overlay");
+        start.set_inner_html(r#"
+            <div class="help-content">
+                <h2>GRAU</h2>
+                <div class="subtitle">Jogo de manobra (wheelie) com moto — 100% original</div>
+                <div class="control-group">
+                    <div class="control"><kbd>W</kbd>/<kbd>↑</kbd> Acelerar</div>
+                    <div class="control"><kbd>S</kbd>/<kbd>↓</kbd> Frear/Ré</div>
+                    <div class="control"><kbd>A</kbd>/<kbd>←</kbd> Esquerda</div>
+                    <div class="control"><kbd>D</kbd>/<kbd>→</kbd> Direita</div>
+                    <div class="control"><kbd>SPACE</kbd> Grau (wheelie)</div>
+                    <div class="control"><kbd>CTRL</kbd> Drift</div>
+                    <div class="control"><kbd>C</kbd> Câmera</div>
+                    <div class="control"><kbd>R</kbd> Resetar</div>
+                </div>
+                <button id="start-btn" class="btn">Jogar</button>
+                <p class="mobile-hint">Celular: toque na esquerda p/ virar, direita p/ acelerar/frear, canto inferior direito p/ grau</p>
+            </div>
+        "#);
+        body.append_child(&start).unwrap();
+
         // Help overlay
         let help = self.document.create_element("div").unwrap();
         help.set_id("help-overlay");
-        help.set_class_name("help-overlay");
+        help.set_class_name("help-overlay hidden");
         help.set_inner_html(r#"
             <div class="help-content">
                 <h2>GRAU - CONTROLS</h2>
@@ -174,6 +216,27 @@ impl UI {
         self.brake_bar = self.document.get_element_by_id("brake-bar").and_then(|e| e.dyn_into::<HtmlElement>().ok());
         self.steering_bar = self.document.get_element_by_id("steering-bar").and_then(|e| e.dyn_into::<HtmlElement>().ok());
         self.help_overlay = self.document.get_element_by_id("help-overlay").and_then(|e| e.dyn_into::<HtmlElement>().ok());
+        self.start_overlay = self.document.get_element_by_id("start-overlay").and_then(|e| e.dyn_into::<HtmlElement>().ok());
+        self.pause_overlay = self.document.get_element_by_id("pause-overlay").and_then(|e| e.dyn_into::<HtmlElement>().ok());
+
+        // Setup start button (gesto do usuário: aqui o AudioContext pode iniciar)
+        if let Some(start_btn) = self.document.get_element_by_id("start-btn") {
+            let start_overlay = self.start_overlay.clone();
+            let closure = Closure::wrap(Box::new(move |_: web_sys::MouseEvent| {
+                if let Some(overlay) = &start_overlay {
+                    overlay.set_class_name("help-overlay hidden");
+                }
+                // Callback externo (inicializa áudio) é disparado via evento customizado
+                if let Some(win) = window() {
+                    let event = web_sys::Event::new("grau-start").ok();
+                    if let Some(ev) = event {
+                        win.dispatch_event(&ev).ok();
+                    }
+                }
+            }) as Box<dyn FnMut(web_sys::MouseEvent)>);
+            start_btn.add_event_listener_with_callback("click", closure.as_ref().unchecked_ref()).unwrap();
+            self.on_start = Some(closure);
+        }
 
         // Setup help toggle
         let help_overlay = self.help_overlay.clone();
@@ -276,8 +339,31 @@ impl UI {
         }
     }
 
-    pub fn update_dom(&mut self) {
-        // Input bars would be updated from game loop with input state
+    pub fn update_dom(&mut self, bike: &Bike) {
+        // Barras de input atualizadas a cada frame a partir do estado da moto
+        self.set_throttle(bike.throttle);
+        self.set_brake(bike.brake);
+        self.set_steering(bike.steering_input);
+        self.set_drift_active(bike.is_drift_active);
+        self.set_wheelie_active(bike.wheelie_angle > 5.0);
+    }
+
+    /// Esconde a tela inicial (após o clique em JOGAR).
+    pub fn hide_start(&mut self) {
+        if let Some(overlay) = &self.start_overlay {
+            overlay.set_class_name("help-overlay hidden");
+        }
+    }
+
+    /// Mostra/esconde o overlay de pausa.
+    pub fn set_paused(&mut self, paused: bool) {
+        if let Some(overlay) = &self.pause_overlay {
+            if paused {
+                overlay.set_class_name("help-overlay");
+            } else {
+                overlay.set_class_name("help-overlay hidden");
+            }
+        }
     }
 
     pub fn update_fps(&mut self, fps: f32) {

@@ -72,6 +72,11 @@ pub struct Bike {
     pub total_distance: f32,
     pub best_wheelie_time: f32,
     pub best_wheelie_angle: f32,
+
+    // Dano visual/funcional (0 = novo, 1 = destruído)
+    pub damage: f32,
+    // Se a moto tombou (queda) — usado para reset suave
+    pub fallen: bool,
 }
 
 impl Default for Bike {
@@ -106,6 +111,8 @@ impl Bike {
             total_distance: 0.0,
             best_wheelie_time: 0.0,
             best_wheelie_angle: 0.0,
+            damage: 0.0,
+            fallen: false,
         }
     }
 
@@ -173,11 +180,61 @@ impl Bike {
 
         // Distance
         self.total_distance += self.speed * dt;
+
+        // Detecta tombo: inclinação lateral (roll) grande com pouca velocidade
+        // ou ângulo de grau acima do crítico (75°) conta como "capotou p/ trás"
+        let (pitch, _, roll) = self.transform.euler_angles();
+        let roll_deg = roll.to_degrees().abs();
+        let pitch_deg = pitch.to_degrees().abs();
+        if (roll_deg > 70.0 && self.speed < 3.0) || pitch_deg > 100.0 {
+            self.fallen = true;
+        }
+    }
+
+    /// Aplica dano e marca tombo se necessário. Retorna true se acabou de tombar.
+    pub fn apply_damage(&mut self, amount: f32) -> bool {
+        self.damage = (self.damage + amount).clamp(0.0, 1.0);
+        if self.damage >= 1.0 && !self.fallen {
+            self.fallen = true;
+            return true;
+        }
+        false
     }
 
     pub fn reset(&mut self) {
+        // Preserva recordes (best_*) entre resets
+        let best_time = self.best_wheelie_time;
+        let best_angle = self.best_wheelie_angle;
         *self = Self::new();
+        self.best_wheelie_time = best_time;
+        self.best_wheelie_angle = best_angle;
     }
+
+    /// Persiste recordes no localStorage (best angle/time). Chamado ao encerrar sessão.
+    pub fn save_records(&self) {
+        if let Some(win) = web_sys::window() {
+            if let Ok(Some(storage)) = win.local_storage() {
+                let _ = storage.set_item("grau_best_time", &format!("{:.2}", self.best_wheelie_time));
+                let _ = storage.set_item("grau_best_angle", &format!("{:.2}", self.best_wheelie_angle));
+            }
+        }
+    }
+
+    /// Carrega recordes do localStorage, se existirem.
+    pub fn load_records(&mut self) {
+        if let Some(win) = web_sys::window() {
+            if let Ok(Some(storage)) = win.local_storage() {
+                if let Ok(Some(t)) = storage.get_item("grau_best_time") {
+                    self.best_wheelie_time = t.parse().unwrap_or(0.0);
+                }
+                if let Ok(Some(a)) = storage.get_item("grau_best_angle") {
+                    self.best_wheelie_angle = a.parse().unwrap_or(0.0);
+                }
+            }
+        }
+    }
+
+    /// Salva e zera? não — apenas salva. Mantido simples.
 
     pub fn get_wheel_positions(&self) -> (Vector3<f32>, Vector3<f32>) {
         let front_offset = self.transform.forward() * (self.wheelbase / 2.0);

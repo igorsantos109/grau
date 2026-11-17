@@ -30,12 +30,16 @@ impl AudioManager {
         }
     }
 
+    /// Inicializa o AudioContext. Deve ser chamado a partir de um gesto do usuário
+    /// (clique/tecla) para satisfazer a política de autoplay do navegador.
     pub fn init(&mut self) {
         if self.initialized {
             return;
         }
 
         if let Ok(context) = AudioContext::new() {
+            // Tenta retomar imediatamente (funciona quando há gesto do usuário)
+            let _ = context.resume();
             self.context = Some(context.clone());
             
             // Master gain
@@ -111,10 +115,21 @@ impl AudioManager {
         }
     }
 
+    /// Garante que o contexto está rodando; se ainda não foi inicializado por um
+    /// gesto do usuário, não faz nada (evita spam de warnings de autoplay).
+    pub fn ensure_running(&mut self) {
+        if let Some(context) = &self.context {
+            let _ = context.resume();
+        }
+    }
+
     pub fn update(&mut self, bike: &Bike) {
         if !self.initialized {
-            self.init();
+            // Não inicializa sozinho aqui: AudioContext exige gesto do usuário.
+            // A tela inicial (start screen) chama init() no clique.
+            return;
         }
+        self.ensure_running();
 
         let Some(_context) = &self.context else { return };
 

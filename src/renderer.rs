@@ -272,9 +272,10 @@ impl Renderer {
         // TODO: Implement wheel trace rendering for drift/wheelie marks
     }
 
-    pub fn render_ui(&mut self, ui: &mut UI) {
-        // UI is rendered via HTML/CSS overlay, not WebGL
-        ui.update_dom();
+    pub fn render_ui(&mut self, ui: &mut UI, bike: &Bike) {
+        // UI é renderizada via overlay HTML/CSS, não WebGL.
+        // As barras de input (throttle/freio/direção) são atualizadas aqui.
+        ui.update_dom(bike);
     }
 }
 
