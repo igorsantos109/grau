@@ -5,8 +5,9 @@
 - [x] Teste automatizado mínimo (smoke_test.sh)
 - [x] Tela inicial com gesto de áudio (0 warnings autoplay)
 - [x] Validação interativa de input — autotest.sh PASS (?autotest=1, moto acelera)
-- [ ] Limpar warnings de dead code + deps não usadas ← PRÓXIMO
+- [x] Limpar warnings de dead code + deps não usadas (0 warnings)
 - [ ] Criar HANDOFF.md na raiz de grau-web
+- [ ] Circuito com checkpoints/cones e placar de volta ← PRÓXIMO
 
 ## Fase 1 — Vertical slice polido
 - [x] Pausa (ESC/P) com overlay

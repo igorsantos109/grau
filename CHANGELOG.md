@@ -1,5 +1,12 @@
 # CHANGELOG — grau-web
 
+## 2026-11-17 17:21 — Iteração 5
+- chore: build 100% limpo — 0 warnings no cargo check
+- remove deps não usadas (console_log, serde_json, web-time)
+- anota dead code com #[allow(dead_code)] (camera shake, áudio extra, input mouse, etc.)
+- test: autotest.sh e smoke_test.sh seguem PASS após limpeza (sem regressão)
+- commit: 87c63b3
+
 ## 2026-11-17 16:47 — Iteração 4
 - feat: modo autotest (?autotest=1) simula W depois Space por 220 frames e loga resultado
 - add: scripts/autotest.sh (Chrome headless tempo real) → PASS (speed 16.8 km/h, dist 6.1 m)

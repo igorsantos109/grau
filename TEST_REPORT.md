@@ -1,5 +1,11 @@
 # TEST_REPORT — grau-web
 
+## 2026-11-17 17:21 — Iteração 5 (build limpo)
+- `cargo check --target wasm32-unknown-unknown`: PASS com **0 warnings** (antes: 23+3)
+- Removidas deps não usadas (console_log, serde_json, web-time); dead code anotado com #[allow(dead_code)]
+- `scripts/autotest.sh`: PASS GERAL (speed 16.8 km/h, dist 6.1 m, 0 erros fatais JS)
+- `scripts/smoke_test.sh`: PASS (WASM inicia, sem erro fatal)
+
 ## 2026-11-17 16:47 — Iteração 4 (autotest interativo)
 - `scripts/autotest.sh` (Chrome headless tempo real 20s, ?autotest=1):
   - `[GRAU][AUTOTEST] RESULT speed_kmh=16.8 dist_m=6.1 wheelie_deg=0.0 frames=220`

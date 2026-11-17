@@ -1,11 +1,13 @@
 # NEXT_ACTION — grau-web
 
 ## Próxima ação (menor, testável)
-Limpar warnings de build: remover deps não usadas (console_log, serde_json, web-time) do
-Cargo.toml e remover/prefixar com _ os setters e imports mortos apontados pelo cargo check.
-Critério: `cargo check` termina com 0 warnings (ou só warnings justificados).
+Adicionar circuito simples com checkpoints: 4–6 cones (cilindros) num anel no chão; ao passar
+por cada checkpoint na ordem, loga [GRAU][CHECKPOINT] i/N e no fim mostra tempo total + loga
+[GRAU][LAP] complete time=...s. Validar via autotest estendido (?autotest=lap) que dirige a
+moto em círculo e confirma que os checkpoints disparam. Render: cones como cilindros coloridos
+no renderer existente.
 
 ## Depois dela
-- Circuito com checkpoints/cones e placar de volta (P2)
 - Indicador visual de dano no HUD (bike.damage)
 - Gamepad API (P3)
+- Cenário com prédios procedurais (P3)

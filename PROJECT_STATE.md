@@ -1,6 +1,6 @@
 # PROJECT_STATE — grau-web
 
-Última atualização: 2026-11-17 16:47 (iteração 4)
+Última atualização: 2026-11-17 17:21 (iteração 5)
 
 ## O que é este projeto
 Protótipo jogável web (Rust → WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie), 100% original.
@@ -13,7 +13,8 @@ Baseado em engenharia reversa educacional do APK na raiz, mas sem copiar assets/
 - Git local em grau-web/ (commits: bc329f3 baseline, aa19c7b gitignore, 2963f0e feat iteração 2)
 
 ## O que funciona (validado em headless)
-- Build release compila sem erros; WASM carrega e inicia o loop (logs [GRAU] tick)
+- Build release compila com **0 warnings**; WASM carrega e inicia o loop
+- Autotest (?autotest=1) prova que física+input funcionam: moto acelera até 16.8 km/h e percorre 6.1 m
 - WebGL2 context + shaders compilam; sem erros fatais de JS
 - Tela inicial com botão JOGAR (dispara evento que inicia AudioContext — 0 warnings de autoplay)
 - HUD overlay: velocidade, RPM, marcha, ângulo/tempo de grau, best, distância, câmera, FPS
