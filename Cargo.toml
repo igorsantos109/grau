@@ -66,6 +66,7 @@ web-sys = { version = "0.3.107", features = [
     "DomRect",
     "DomRectReadOnly",
     "Storage",
+    "Location",
 ] }
 nalgebra = { version = "0.32", features = ["serde"] }
 rand = "0.8"

@@ -14,6 +14,14 @@ use js_sys::Date;
 use wasm_bindgen::prelude::Closure;
 use wasm_bindgen::JsCast;
 
+/// Detecta ?autotest=1 na URL para ativar o modo de teste automatizado.
+fn detect_autotest() -> bool {
+    web_sys::window()
+        .and_then(|w| w.location().search().ok())
+        .map(|s| s.contains("autotest=1"))
+        .unwrap_or(false)
+}
+
 pub struct Game {
     physics: PhysicsEngine,
     renderer: Renderer,
@@ -25,6 +33,9 @@ pub struct Game {
     last_time: f64,
     running: bool,
     paused: bool,
+    autotest: bool,
+    autotest_frame: u64,
+    autotest_done: bool,
     frame_count: u64,
 }
 
@@ -93,6 +104,9 @@ impl Game {
             last_time: Date::now(),
             running: true,
             paused: false,
+            autotest: detect_autotest(),
+            autotest_frame: 0,
+            autotest_done: false,
             frame_count: 0,
         }
     }
@@ -188,8 +202,13 @@ impl Game {
             return; // congela física/câmera, mas segue renderizando e leggando input
         }
 
-        // Handle game controls
-        self.handle_input(dt);
+        // Modo autotest (?autotest=1): simula input por código para validação headless
+        if self.autotest && !self.autotest_done {
+            self.run_autotest(dt);
+        } else {
+            // Handle game controls
+            self.handle_input(dt);
+        }
 
         // Update physics
         self.physics.update(&mut self.bike, dt as f32, &self.input);
@@ -209,6 +228,45 @@ impl Game {
         // Update UI (HUD + barras de input)
         self.ui.update(&self.bike, &self.camera);
         self.ui.update_dom(&self.bike);
+    }
+
+    /// Autotest: simula W (acelerar) por alguns segundos, depois Space (wheelie),
+    /// e loga o resultado para validação headless ler no console.
+    /// Ativado com ?autotest=1 na URL.
+    fn run_autotest(&mut self, dt: f64) {
+        self.autotest_frame += 1;
+        let f = self.autotest_frame;
+
+        // Fase 1 (frames 10..130): acelerar (W)
+        if f >= 10 && f < 130 {
+            self.bike.apply_throttle(1.0);
+            self.bike.apply_steering(0.0);
+        } else if f >= 130 && f < 220 {
+            // Fase 2: tentar wheelie (Space)
+            self.bike.apply_throttle(0.3);
+            self.bike.start_wheelie();
+        } else if f >= 220 {
+            // Fim: loga resultado
+            self.autotest_done = true;
+            let speed_kmh = self.bike.speed * 3.6;
+            let dist = self.bike.total_distance;
+            let wheelie = self.bike.wheelie_angle;
+            web_sys::console::log_1(&format!(
+                "[GRAU][AUTOTEST] RESULT speed_kmh={:.1} dist_m={:.1} wheelie_deg={:.1} frames={}",
+                speed_kmh, dist, wheelie, f
+            ).into());
+            // Critério de aceite: moto andou (dist > 5m)
+            if dist > 5.0 {
+                web_sys::console::log_1(&"[GRAU][AUTOTEST] PASS: moto acelerou e percorreu distância".into());
+            } else {
+                web_sys::console::log_1(&"[GRAU][AUTOTEST] FAIL: moto não saiu do lugar".into());
+            }
+            return;
+        }
+
+        // Física e câmera seguem normalmente
+        self.physics.update(&mut self.bike, dt as f32, &self.input);
+        self.camera.update(&self.bike, dt as f32);
     }
 
     fn handle_input(&mut self, dt: f64) {
