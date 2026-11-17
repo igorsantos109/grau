@@ -1,7 +1,16 @@
 # CHANGELOG — grau-web
 
+## 2026-11-17 16:19 — Iteração 3
+- feat: tela inicial (start overlay) com botão JOGAR que inicia AudioContext via gesto (evento grau-start)
+- feat: pausa com ESC/P e overlay "PAUSADO"
+- feat: recordes best angle/time persistem em localStorage (save/load no Bike)
+- feat: reset suave automático ao tombar (fallen) salvando recordes antes
+- feat: barras de input (throttle/freio/direção) e indicadores DRIFT/WHEELIE atualizam por frame
+- fix: 0 warnings de autoplay — áudio não tenta iniciar antes do gesto
+- add: Storage ao web-sys features; scripts/smoke_test.sh agora faz build+serve+headless
+- test: smoke headless PASS, 0 erros fatais de JS
+- commit: 2963f0e
+
 ## 2026-11-16 — Iteração 1
-- Criados PROJECT_STATE.md, BACKLOG.md, DECISIONS.md, TEST_REPORT.md, NEXT_ACTION.md, CHANGELOG.md
-- Build release WASM refeito e sincronizado pkg/ → public/ (js + wasm + index)
-- Repositório git iniciado em grau-web/ com baseline (bc329f3) e gitignore de artefatos gerados
-- Verificado: cargo check PASS, wasm-pack release PASS, servidor estático serve index/js/wasm com 200
+- Criados PROJECT_STATE/BACKLOG/DECISIONS/TEST_REPORT/NEXT_ACTION/CHANGELOG
+- Build release sincronizado pkg→public; git init baseline (bc329f3) + gitignore (aa19c7b)

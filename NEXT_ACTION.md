@@ -1,11 +1,15 @@
 # NEXT_ACTION — grau-web
 
 ## Próxima ação (menor, testável)
-Criar validação runtime automatizada mínima: script `scripts/smoke_test.sh` (ou node) que
-1) gera build release, 2) copia pkg→public, 3) sobe `python3 -m http.server` em public,
-4) faz fetch de index/js/wasm (200) e 5) se houver Chromium/Chrome headless disponível, abre a página e captura erros de console por ~5s.
-
-Se headless não existir, registrar em TEST_REPORT.md e pedir validação manual guiada ao humano (abrir URL, confirmar render + WASD + HUD).
+Adicionar validação interativa automatizada: estender scripts/smoke_test.sh (ou novo script
+scripts/input_test.sh) para, após carregar a página no Chrome headless com remote debugging,
+disparar teclas (W por 2s, depois Space) via CDP (Chrome DevTools Protocol) e verificar no
+console/DOM que a velocidade (HUD #speed-value) mudou de 0 e que não há erros.
+Alternativa mais simples: injetar no index.html um "modo teste" (query ?autotest=1) que
+simula input por código e loga [GRAU][AUTOTEST] speed=... após N frames — validável só de
+ler o console headless, sem CDP.
 
 ## Depois dela
-P0 do BACKLOG: tela inicial com gesto de áudio + limpar warnings.
+- Limpar warnings de dead code e deps não usadas (P1)
+- Circuito com checkpoints/cones e placar de volta (P2)
+- Gamepad API (P3)
