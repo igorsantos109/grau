@@ -1,0 +1,55 @@
+# CI/CD do grau-web: builda o WASM e publica o jogo jogável no GitHub Pages.
+# O jogo fica disponível em https://igorsantos109.github.io/grau/
+name: Build e Deploy (WASM → Pages)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instala Rust + wasm-pack
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo install wasm-pack --locked || true
+
+      - name: Build release WASM
+        run: wasm-pack build --target web --out-dir pkg --release
+
+      - name: Monta site jogável (public/ + pkg/)
+        run: |
+          mkdir -p site
+          cp public/index.html site/
+          cp pkg/grau_web.js pkg/grau_web_bg.wasm site/
+
+      - name: Upload artifact do Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
