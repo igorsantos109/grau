@@ -1,6 +1,6 @@
 # HANDOFF — grau-web
 
-Última atualização: 2026-11-17 17:49 (iteração 5, pós-publicação no GitHub)
+Última atualização: 2026-11-17 18:46 (iteração 6, publicado + CI/CD no ar)
 
 ## Objetivo
 Protótipo jogável web (Rust→WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie),
@@ -17,6 +17,8 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - [x] Recordes persistem em localStorage
 - [x] Documentação completa (README + 6 arquivos de estado + HANDOFF)
 - [x] Publicado em https://github.com/igorsantos109/grau (branch main)
+- [x] CI/CD: `.github/workflows/build-and-deploy.yml` builda WASM e deploy em GitHub Pages
+- [x] Jogo online jogável em https://igorsantos109.github.io/grau/ (autotest PASS no site remoto)
 
 ## Restrições e configurações protegidas
 - Nunca copiar assets/nomes/marcas de jogos comerciais (GTA, Projeto Grau original). Tudo procedural.
@@ -39,6 +41,8 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - `scripts/autotest.sh`: PASS GERAL — `[GRAU][AUTOTEST] RESULT speed_kmh=16.8 dist_m=6.1 frames=220`
 - `scripts/smoke_test.sh`: PASS — WASM inicia, sem Uncaught/TypeError
 - GitHub: repo `igorsantos109/grau` main atualizado com todo o código
+- GitHub Pages: https://igorsantos109.github.io/grau/ servindo index+js+wasm (200) — autotest PASS remoto
+- Workflow `Build e Deploy (WASM → Pages)`: completed/success (run 44182610331)
 
 ## Arquivos alterados (referências)
 - Código: `src/{lib,game,physics,bike,renderer,camera,input,audio,ui}.rs`, `Cargo.toml`
@@ -62,6 +66,7 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 ## Próxima ação concreta
 Implementar circuito com 4–6 checkpoints (cones/cilindros) em anel; autotest estendido
 (`?autotest=lap`) dirige em círculo e valida que checkpoints disparam e tempo de volta é logado.
+Após cada push na main, o CI publica automaticamente a nova build no Pages.
 Ver `NEXT_ACTION.md`.
 
 ## Reversão

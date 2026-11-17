@@ -1,5 +1,12 @@
 # TEST_REPORT — grau-web
 
+## 2026-11-17 18:46 — Iteração 6 (publicado + CI/CD)
+- Push para https://github.com/igorsantos109/grau (main): OK (merge preservou LICENSE AGPL do remote)
+- GitHub Actions workflow `Build e Deploy (WASM → Pages)`: **success** (run 44182610331)
+- GitHub Pages: https://igorsantos109.github.io/grau/ → index/js/wasm retornam **200**
+- Autotest headless contra o SITE REMOTO: **PASS** — `[GRAU][AUTOTEST] RESULT speed_kmh=16.8 dist_m=6.1 frames=220`
+- smoke_test.sh e autotest.sh locais: PASS (sem regressão)
+
 ## 2026-11-17 17:21 — Iteração 5 (build limpo)
 - `cargo check --target wasm32-unknown-unknown`: PASS com **0 warnings** (antes: 23+3)
 - Removidas deps não usadas (console_log, serde_json, web-time); dead code anotado com #[allow(dead_code)]

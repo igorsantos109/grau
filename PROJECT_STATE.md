@@ -1,6 +1,11 @@
 # PROJECT_STATE — grau-web
 
-Última atualização: 2026-11-17 17:21 (iteração 5)
+Última atualização: 2026-11-17 18:46 (iteração 6)
+
+## 🚀 Online
+- Repo: https://github.com/igorsantos109/grau (branch main)
+- **Jogo jogável:** https://igorsantos109.github.io/grau/ (CI/CD automático via GitHub Actions)
+- Autotest no site remoto: PASS
 
 ## O que é este projeto
 Protótipo jogável web (Rust → WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie), 100% original.

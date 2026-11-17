@@ -4,7 +4,8 @@ Protótipo jogável em web (Rust → WebAssembly/WebGL2) de um jogo de motocicle
 manobra "grau" (wheelie), drift e zerinho (donut). Todo o código, arte e áudio são
 **originais e procedurais** — nenhum asset, nome, marca ou código de terceiros é usado.
 
-> Rodar no navegador: build WASM + página estática. Sem engine externa, sem assets baixados.
+> 🎮 **Jogar agora (online):** [https://igorsantos109.github.io/grau/](https://igorsantos109.github.io/grau/)
+> (build automático via GitHub Actions → GitHub Pages a cada push na `main`)
 
 ## 🎮 Como jogar
 
@@ -47,6 +48,13 @@ Abra **http://127.0.0.1:8899**, clique em **JOGAR** (inicia o áudio — navegad
 - Recordes (melhor ângulo/tempo de grau) persistem em `localStorage`
 - Áudio procedural (Web Audio): motor por RPM, vento por velocidade, derrapagem
 - Suporte a toque (mobile)
+
+## 🚀 Deploy automático (CI/CD)
+
+- Workflow `.github/workflows/build-and-deploy.yml` builda o WASM (`wasm-pack --release`)
+  e publica em **GitHub Pages** a cada push na `main`.
+- Site jogável: https://igorsantos109.github.io/grau/
+- Validado em headless contra o site publicado: autotest PASS (moto acelera 16.8 km/h, 6.1 m).
 
 ## 🧪 Testes automatizados
 

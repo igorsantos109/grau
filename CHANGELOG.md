@@ -1,5 +1,12 @@
 # CHANGELOG — grau-web
 
+## 2026-11-17 18:46 — Iteração 6 (docs + publish + CI/CD)
+- docs: README reescrito em PT-BR com link do jogo online; HANDOFF.md criado
+- ci: `.github/workflows/build-and-deploy.yml` builda WASM e deploy automático no GitHub Pages
+- publish: push p/ github.com/igorsantos109/grau (main), merge preservando LICENSE AGPL
+- pages: https://igorsantos109.github.io/grau/ no ar — autotest PASS remoto (16.8 km/h, 6.1 m)
+- workflow run 44182610331: success
+
 ## 2026-11-17 17:21 — Iteração 5
 - chore: build 100% limpo — 0 warnings no cargo check
 - remove deps não usadas (console_log, serde_json, web-time)
