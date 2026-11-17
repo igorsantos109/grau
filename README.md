@@ -1,152 +1,104 @@
-# Grau - Motorcycle Wheelie Game (Web Version)
+# Grau Web — Jogo de Moto com Manobra (Wheelie) 100% Original
 
-A Rust/WASM rewrite of the Grau motorcycle wheelie game for the web, based on reverse-engineering the original Unity Android APK.
+Protótipo jogável em web (Rust → WebAssembly/WebGL2) de um jogo de motocicleta focado em
+manobra "grau" (wheelie), drift e zerinho (donut). Todo o código, arte e áudio são
+**originais e procedurais** — nenhum asset, nome, marca ou código de terceiros é usado.
 
-## Features
+> Rodar no navegador: build WASM + página estática. Sem engine externa, sem assets baixados.
 
-- **Realistic Motorcycle Physics** - Based on reverse-engineered physics parameters from the original game
-- **Wheelie System** - Authentic wheelie mechanics with sustentation force, critical angle, and force reverse
-- **Drift Physics** - Sideways force, reduced rear friction, drift rotation torque
-- **Zerinho (Donut)** - High-steering low-speed spinning mechanic
-- **Multiple Camera Modes** - Third person, first person, hood, cinematic, drone
-- **Touch/Mobile Support** - Full touchscreen controls
-- **WebGL2 Renderer** - Custom shaders for bike, ground, skybox
-- **Web Audio API** - Engine, wind, and tire screech sounds
-
-## Reverse-Engineered Physics Parameters
-
-Extracted from `libil2cpp.so` and `global-metadata.dat`:
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `forcaSustentacaoGrau` | 150.0 | Wheelie sustentation force |
-| `anguloForceReverse` | 45.0 | Force reverse angle threshold |
-| `forceReverse` | 200.0 | Force reverse strength |
-| `zerinhoRotationTorque` | 500.0 | Donut spin torque |
-| `steerInputForZerinhoThreshold` | 0.8 | Steering threshold for zerinho |
-| `zerinhoRearFriction` | 0.3 | Rear friction during zerinho |
-| `zerinhoAngularDrag` | 2.0 | Angular drag during zerinho |
-| `minSpeedForDrift` | 10.0 | Minimum speed for drift |
-| `driftSidewaysForce` | 300.0 | Drift sideways force |
-| `driftRearFriction` | 0.4 | Rear friction during drift |
-| `driftFrontFriction` | 0.8 | Front friction during drift |
-| `driftBrakingFactor` | 0.5 | Drift braking factor |
-| `driftRotationTorque` | 200.0 | Drift rotation torque |
-| `driftAngularDrag` | 1.5 | Angular drag during drift |
-| `wheelieTorque` | 1000.0 | Wheelie torque |
-| `wheelieDrag` | 0.1 | Wheelie drag |
-| `wheelieAngularMultiplier` | 1.5 | Wheelie angular multiplier |
-| `wheelieBrakeForce` | 500.0 | Wheelie brake force |
-| `criticalAngle` | 75.0 | Critical wheelie angle (degrees) |
-| `wheelieSpeed` | 30.0 | Minimum speed for wheelie |
-| `wheelieReturnSpeed` | 5.0 | Wheelie return speed |
-
-## Controls
-
-| Key | Action |
-|-----|--------|
-| `W` / `↑` | Accelerate |
-| `S` / `↓` | Brake/Reverse |
-| `A` / `←` | Steer Left |
-| `D` / `→` | Steer Right |
-| `SPACE` / `SHIFT` | Wheelie |
-| `CTRL` | Drift |
-| `C` | Toggle Camera |
-| `R` | Reset Bike |
-| `H` | Toggle Help |
-
-**Mobile:** Touch left side to steer, right side for throttle/brake, bottom-right for wheelie
-
-## Building
-
-### Prerequisites
-
-- Rust (latest stable)
-- `wasm32-unknown-unknown` target: `rustup target add wasm32-unknown-unknown`
-- `wasm-pack`: `cargo install wasm-pack`
-
-### Development Build
+## 🎮 Como jogar
 
 ```bash
 cd grau-web
-wasm-pack build --target web --out-dir pkg --dev
-```
-
-### Release Build
-
-```bash
-cd grau-web
+./scripts/smoke_test.sh 8899     # build + teste headless automático
+# ou só servir:
 wasm-pack build --target web --out-dir pkg --release
+cp pkg/grau_web.js pkg/grau_web_bg.wasm public/
+python3 -m http.server 8899 --directory public
 ```
 
-### Running Locally
+Abra **http://127.0.0.1:8899**, clique em **JOGAR** (inicia o áudio — navegador exige gesto) e jogue.
+
+### Controles
+
+| Tecla | Ação |
+|-------|------|
+| `W` / `↑` | Acelerar |
+| `S` / `↓` | Frear / Ré |
+| `A` / `←` | Virar esquerda |
+| `D` / `→` | Virar direita |
+| `ESPAÇO` / `SHIFT` | Grau (wheelie) |
+| `CTRL` | Drift (derrapagem) |
+| `C` | Trocar câmera (5 modos) |
+| `R` | Resetar moto |
+| `ESC` / `P` | Pausar |
+| `H` | Ajuda |
+
+**Mobile:** toque na esquerda para virar, direita para acelerar/frear, canto inferior direito para o grau.
+
+## ✨ Funcionalidades
+
+- Física de moto com wheelie (sustentação, ângulo crítico, force reverse), drift e zerinho
+- 5 modos de câmera (terceira pessoa, primeira, capô, cinemática, drone)
+- Renderer WebGL2 com shaders próprios: moto procedural, chão infinito com grid, skybox procedural
+- HUD em HTML/CSS: velocidade, RPM, marcha, ângulo/tempo de grau, recordes, distância, FPS, barras de input
+- Tela inicial com botão JOGAR (inicia áudio via gesto do usuário — sem warnings de autoplay)
+- Pausa (ESC/P), reset (R), reset automático ao tombar
+- Recordes (melhor ângulo/tempo de grau) persistem em `localStorage`
+- Áudio procedural (Web Audio): motor por RPM, vento por velocidade, derrapagem
+- Suporte a toque (mobile)
+
+## 🧪 Testes automatizados
 
 ```bash
-cd grau-web
-# Serve the pkg directory and public folder
-python3 -m http.server 8080 --directory public
-# Or use any static file server
+./scripts/smoke_test.sh 8899    # build + serve + Chrome headless: valida que o WASM inicia sem erro
+./scripts/autotest.sh 8899      # abre ?autotest=1: simula input e prova que a moto acelera (PASS)
 ```
 
-Then open http://localhost:8080
+- `cargo check --target wasm32-unknown-unknown` → **0 warnings, 0 erros**
+- Autotest headless confirma: moto acelera até ~16.8 km/h e percorre ~6 m em 220 frames
 
-## Project Structure
+## 🏗️ Arquitetura
 
 ```
 grau-web/
-├── Cargo.toml
+├── Cargo.toml          # deps: wasm-bindgen, web-sys, nalgebra, rand, serde
 ├── src/
-│   ├── lib.rs           # Entry point
-│   ├── game.rs          # Game loop & state
-│   ├── physics.rs       # Motorcycle physics engine
-│   ├── bike.rs          # Bike entity
-│   ├── renderer.rs      # WebGL2 renderer
-│   ├── camera.rs        # Camera system
-│   ├── input.rs         # Input management
-│   ├── audio.rs         # Web Audio API
-│   └── ui.rs            # HTML/CSS UI overlay
-├── public/
-│   └── index.html       # Main HTML with styles
-└── pkg/                 # Generated WASM output (after build)
+│   ├── lib.rs          # entry point (main)
+│   ├── game.rs         # loop principal, estados, autotest (?autotest=1)
+│   ├── physics.rs      # motor de física (wheelie/drift/zerinho)
+│   ├── bike.rs         # entidade da moto + recordes (localStorage)
+│   ├── renderer.rs     # WebGL2 + shaders procedurais
+│   ├── camera.rs       # 5 modos de câmera + shake
+│   ├── input.rs        # teclado + toque
+│   ├── audio.rs        # Web Audio procedural (motor/vento/derrapagem)
+│   └── ui.rs           # HUD/overlays em HTML/CSS
+├── public/index.html   # página estática (fonte)
+├── scripts/            # smoke_test.sh e autotest.sh (Chrome headless)
+└── pkg/                # saída WASM gerada (gitignored)
 ```
 
-## Architecture
+## 📋 Documentação de estado (loop de desenvolvimento)
 
-### Physics Engine (`physics.rs`)
-- Rigid body simulation with forces and torques
-- Wheelie physics with sustentation and force reverse
-- Drift physics with sideways force and friction modulation
-- Zerinho (donut) physics for high-steer low-speed spinning
-- Gravity, drag, and ground collision
+O projeto segue um loop incremental com arquivos de estado na raiz de `grau-web/`:
 
-### Renderer (`renderer.rs`)
-- WebGL2 with custom vertex/fragment shaders
-- Bike model (procedural cube geometry)
-- Infinite ground plane with grid
-- Procedural skybox with sun, clouds, stars
-- Basic lighting (ambient, diffuse, specular, fresnel)
+- `PROJECT_STATE.md` — estado atual, o que funciona, última build
+- `BACKLOG.md` — backlog priorizado por fases
+- `DECISIONS.md` — decisões técnicas com justificativa
+- `TEST_REPORT.md` — resultados de build/testes
+- `NEXT_ACTION.md` — próxima ação concreta
+- `CHANGELOG.md` — mudanças por iteração
+- `HANDOFF.md` — handoff entre sessões/agentes
 
-### Camera (`camera.rs`)
-- 5 camera modes with smooth interpolation
-- Wheelie tilt compensation
-- Camera shake system
+## 🔧 Build
 
-### Input (`input.rs`)
-- Keyboard, mouse, and touch support
-- Just-pressed/just-released tracking
-- Normalized touch coordinates
+Pré-requisitos: Rust estable, `rustup target add wasm32-unknown-unknown`, `cargo install wasm-pack`.
 
-### Audio (`audio.rs`)
-- Web Audio API oscillators for procedural sounds
-- Engine RPM-based frequency
-- Wind speed-based volume/frequency
-- Drift tire screech
+```bash
+wasm-pack build --target web --out-dir pkg --release   # release (~145 KB wasm, wasm-opt)
+wasm-pack build --target web --out-dir pkg --dev       # debug
+```
 
-## Credits
+## Licença
 
-Original game: **Projeto Grau** by TechGameGroup
-Reverse-engineered using REA (Reverse Engineering Assistant) with JADX and IL2CPP metadata analysis.
-
-## License
-
-This is a reverse-engineering educational project. Original game assets and IP belong to their respective owners.
+Código deste repositório: uso educacional/pessoal. Nenhum asset de terceiros é distribuído.
