@@ -1,6 +1,6 @@
 # PROJECT_STATE — grau-web
 
-Última atualização: 2026-11-17 16:19 (iteração 3)
+Última atualização: 2026-11-17 16:47 (iteração 4)
 
 ## O que é este projeto
 Protótipo jogável web (Rust → WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie), 100% original.

@@ -1,5 +1,11 @@
 # CHANGELOG — grau-web
 
+## 2026-11-17 16:47 — Iteração 4
+- feat: modo autotest (?autotest=1) simula W depois Space por 220 frames e loga resultado
+- add: scripts/autotest.sh (Chrome headless tempo real) → PASS (speed 16.8 km/h, dist 6.1 m)
+- add: Location ao web-sys p/ ler query string
+- test: valida que física+input funcionam sem input humano real
+
 ## 2026-11-17 16:19 — Iteração 3
 - feat: tela inicial (start overlay) com botão JOGAR que inicia AudioContext via gesto (evento grau-start)
 - feat: pausa com ESC/P e overlay "PAUSADO"
