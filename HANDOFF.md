@@ -1,6 +1,6 @@
 # HANDOFF — grau-web
 
-Última atualização: 2026-11-17 18:46 (iteração 6, publicado + CI/CD no ar)
+Última atualização: 2026-11-18 20:36 -03 (P05-F5: commit local do circuito de checkpoints, sem push)
 
 ## Objetivo
 Protótipo jogável web (Rust→WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie),
@@ -32,13 +32,14 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - P02 Vertical slice: CONCLUÍDO (start screen, HUD, pausa, recordes, autotest)
 - P03 Testes automatizados: CONCLUÍDO (smoke_test.sh + autotest.sh headless PASS)
 - P04 Documentação + publish: CONCLUÍDO (README reescrito PT-BR, HANDOFF, push p/ GitHub)
-- P05 Circuito com checkpoints/cones: PENDENTE (próximo)
+- P05 Circuito com checkpoints/cones: EM ANDAMENTO — regra de volta (5 checkpoints em anel) + `?autotest=lap` funcionando; marcadores visuais (cones/cilindros 3D) pendentes
 - P06 Dano visual no HUD, game feel (camera shake/FOV): PENDENTE
 - P07 Gamepad, obstáculos, cenário com prédios: PENDENTE
 
 ## Resultados e verificações
 - `cargo check`: 0 warnings/0 erros (2026-11-17 17:21)
-- `scripts/autotest.sh`: PASS GERAL — `[GRAU][AUTOTEST] RESULT speed_kmh=16.8 dist_m=6.1 frames=220`
+- `scripts/autotest.sh`: PASS GERAL — `[GRAU][AUTOTEST] RESULT speed_kmh=16.8 dist_m=6.1 frames=220` (reverificado 2026-11-18 20:2x, 2/2 runs, sem regressão após P05-F3b)
+- `scripts/autotest_lap.sh`: PASS GERAL — `[GRAU][LAP] COMPLETED lap=1 lap_time_ms≈47376–47399` (2026-11-18 20:2x, 2/2 runs, 5/5 checkpoints)
 - `scripts/smoke_test.sh`: PASS — WASM inicia, sem Uncaught/TypeError
 - GitHub: repo `igorsantos109/grau` main atualizado com todo o código
 - GitHub Pages: https://igorsantos109.github.io/grau/ servindo index+js+wasm (200) — autotest PASS remoto
@@ -64,8 +65,7 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - Push para GitHub realizado com `gh`/token da conta igorsantos109 (escopo: repo grau).
 
 ## Próxima ação concreta
-Implementar circuito com 4–6 checkpoints (cones/cilindros) em anel; autotest estendido
-(`?autotest=lap`) dirige em círculo e valida que checkpoints disparam e tempo de volta é logado.
+P05-F6: revisão do commit local do circuito (ou P05: marcadores visuais 3D dos checkpoints — cones/cilindros no anel).
 Após cada push na main, o CI publica automaticamente a nova build no Pages.
 Ver `NEXT_ACTION.md`.
 
