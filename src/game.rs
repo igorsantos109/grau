@@ -14,8 +14,8 @@ use wasm_bindgen::JsCast;
 use nalgebra::Vector3;
 
 /// P05-F3: circuito mínimo de volta — 5 checkpoints em anel (raio 30m) no plano XZ.
-const LAP_CHECKPOINT_RADIUS: f32 = 8.0;
-const LAP_CHECKPOINTS: [(f32, f32); 5] = [
+pub const LAP_CHECKPOINT_RADIUS: f32 = 8.0;
+pub const LAP_CHECKPOINTS: [(f32, f32); 5] = [
     (30.0, 0.0),
     (9.27, 28.53),
     (-24.27, 17.63),

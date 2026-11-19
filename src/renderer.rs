@@ -3,6 +3,7 @@
 use crate::bike::Bike;
 use crate::camera::Camera;
 use crate::ui::UI;
+use crate::game::LAP_CHECKPOINTS;
 use web_sys::{WebGl2RenderingContext, HtmlCanvasElement, WebGlProgram, WebGlShader, WebGlUniformLocation, WebGlVertexArrayObject};
 use nalgebra::{Matrix4, Vector3};
 use std::rc::Rc;
@@ -17,16 +18,19 @@ pub struct Renderer {
     bike_program: WebGlProgram,
     ground_program: WebGlProgram,
     skybox_program: WebGlProgram,
+    cone_program: WebGlProgram,
     
     // Buffers
     bike_vao: WebGlVertexArrayObject,
     ground_vao: WebGlVertexArrayObject,
     skybox_vao: WebGlVertexArrayObject,
+    cone_vao: WebGlVertexArrayObject,
     
     // Uniform locations
     bike_uniforms: BikeUniforms,
     ground_uniforms: GroundUniforms,
     skybox_uniforms: SkyboxUniforms,
+    cone_uniforms: ConeUniforms,
     
     // Camera matrices
     view_matrix: Matrix4<f32>,
@@ -60,6 +64,12 @@ struct SkyboxUniforms {
     u_time: WebGlUniformLocation,
 }
 
+struct ConeUniforms {
+    u_model: WebGlUniformLocation,
+    u_view: WebGlUniformLocation,
+    u_projection: WebGlUniformLocation,
+}
+
 impl Renderer {
     pub fn new(canvas: &HtmlCanvasElement) -> Result<Self, JsValue> {
         web_sys::console::log_1(&"[RENDERER] Getting webgl2 context...".into());
@@ -89,6 +99,8 @@ impl Renderer {
         let ground_program = compile_program(&gl, GROUND_VERTEX_SHADER, GROUND_FRAGMENT_SHADER)?;
         web_sys::console::log_1(&"[RENDERER] Compiling skybox shader...".into());
         let skybox_program = compile_program(&gl, SKYBOX_VERTEX_SHADER, SKYBOX_FRAGMENT_SHADER)?;
+        web_sys::console::log_1(&"[RENDERER] Compiling cone shader...".into());
+        let cone_program = compile_program(&gl, CONE_VERTEX_SHADER, CONE_FRAGMENT_SHADER)?;
         web_sys::console::log_1(&"[RENDERER] All shaders compiled!".into());
 
         // Get uniform locations - use expect with message instead of unwrap
@@ -119,6 +131,12 @@ impl Renderer {
             u_projection: get_uniform(&skybox_program, "u_projection"),
             u_time: get_uniform(&skybox_program, "u_time"),
         };
+
+        let cone_uniforms = ConeUniforms {
+            u_model: get_uniform(&cone_program, "u_model"),
+            u_view: get_uniform(&cone_program, "u_view"),
+            u_projection: get_uniform(&cone_program, "u_projection"),
+        };
         web_sys::console::log_1(&"[RENDERER] Uniforms found".into());
 
         // Create geometry
@@ -126,6 +144,7 @@ impl Renderer {
         let bike_vao = create_bike_geometry(&gl)?;
         let ground_vao = create_ground_geometry(&gl)?;
         let skybox_vao = create_skybox_geometry(&gl)?;
+        let cone_vao = create_cone_geometry(&gl)?;
         web_sys::console::log_1(&"[RENDERER] Geometry created!".into());
 
         Ok(Self {
@@ -134,12 +153,15 @@ impl Renderer {
             bike_program,
             ground_program,
             skybox_program,
+            cone_program,
             bike_vao,
             ground_vao,
             skybox_vao,
+            cone_vao,
             bike_uniforms,
             ground_uniforms,
             skybox_uniforms,
+            cone_uniforms,
             view_matrix: Matrix4::identity(),
             projection_matrix: Matrix4::identity(),
             time: 0.0,
@@ -172,6 +194,9 @@ impl Renderer {
 
         // Render ground
         self.render_ground();
+
+        // Render checkpoints (cones)
+        self.render_checkpoints();
 
         // Render bike
         self.render_bike(bike);
@@ -270,6 +295,28 @@ impl Renderer {
 
     fn render_wheel_traces(&mut self, _bike: &Bike) {
         // TODO: Implement wheel trace rendering for drift/wheelie marks
+    }
+
+    /// Renderizador de checkpoints (cones) para o circuito de volta
+    /// Cada cone representa um checkpoint no anel
+    fn render_checkpoints(&mut self) {
+        let gl = &self.gl;
+        gl.use_program(Some(&self.cone_program));
+        gl.bind_vertex_array(Some(&self.cone_vao));
+
+        for (_i, (cx, cz)) in LAP_CHECKPOINTS.iter().enumerate() {
+            // Model matrix: translate to checkpoint position, scale to cone size
+            let mut model = Matrix4::identity();
+            model.append_translation_mut(&Vector3::new(*cx, 0.0, *cz));
+            model.append_nonuniform_scaling_mut(&Vector3::new(1.5, 2.5, 1.5)); // Cone dimensions
+
+            gl.uniform_matrix4fv_with_f32_array(Some(&self.cone_uniforms.u_model), false, &model.as_slice());
+            gl.uniform_matrix4fv_with_f32_array(Some(&self.cone_uniforms.u_view), false, &self.view_matrix.as_slice());
+            gl.uniform_matrix4fv_with_f32_array(Some(&self.cone_uniforms.u_projection), false, &self.projection_matrix.as_slice());
+
+            // Draw cone: 7 triangles (21 vertices)
+            gl.draw_arrays(WebGl2RenderingContext::TRIANGLES, 0, 7);
+        }
     }
 
     pub fn render_ui(&mut self, ui: &mut UI, bike: &Bike) {
@@ -652,4 +699,105 @@ void main() {
 }
 "#;
 
+// Cone shader for checkpoints
+const CONE_VERTEX_SHADER: &str = r#"#version 300 es
+in vec3 a_position;
+in vec3 a_normal;
+
+uniform mat4 u_model;
+uniform mat4 u_view;
+uniform mat4 u_projection;
+uniform float u_time;
+
+out vec3 v_world_pos;
+out vec3 v_normal;
+
+void main() {
+    mat4 model = u_model;
+    vec4 world_pos = model * vec4(a_position, 1.0);
+    v_world_pos = world_pos.xyz;
+    v_normal = mat3(transpose(inverse(model))) * a_normal;
+    gl_Position = u_projection * u_view * world_pos;
+}
+"#;
+
+const CONE_FRAGMENT_SHADER: &str = r#"#version 300 es
+precision highp float;
+
+in vec3 v_normal;
+
+out vec4 fragColor;
+
+void main() {
+    vec3 normal = normalize(v_normal);
+    
+    float ambient = 0.4;
+    float diff = max(dot(normal, vec3(0.0, 1.0, 0.0)), 0.0);
+    
+    // Orange cone color (sRGB 255, 165, 0)
+    vec3 cone_base = vec3(1.0, 0.65, 0.2);
+    vec3 color = cone_base * (ambient + diff * 0.5);
+    
+    fragColor = vec4(color, 1.0);
+}
+"#;
+
 use wasm_bindgen::JsValue;
+
+/// Creates a simple cone geometry (apex at top, base at bottom)
+/// 18 vertices with position(3) + normal(3) = 216 floats
+fn create_cone_geometry(gl: &WebGl2RenderingContext) -> Result<WebGlVertexArrayObject, JsValue> {
+    let vao = gl.create_vertex_array().unwrap();
+    gl.bind_vertex_array(Some(&vao));
+
+    // Cone vertices: apex + base
+    // We create a simple cylinder/cone shape with proper normals
+    // 21 vertices with position(3) + normal(3) = 126 floats
+    let s = 1.0; // scale
+    let vertices: [f32; 126] = [
+        // Base triangle (3 vertices, y=0)
+        -s, 0.0, -s,  0.0, 1.0, 0.0,
+         s, 0.0, -s,  0.0, 1.0, 0.0,
+        -s, 0.0,  s,  0.0, 1.0, 0.0,
+        // Front face - apex to base edge
+        0.0, 2.0, 0.0,  0.0, 0.45, 0.0,
+        -s, 0.0, -s,   0.0, 1.0, 0.0,
+        s, 0.0, -s,    0.0, 1.0, 0.0,
+        // Right face
+        0.0, 2.0, 0.0,  0.45, 0.45, 0.0,
+        s, 0.0, -s,    0.0, 1.0, 0.0,
+        s, 0.0, s,     0.0, 1.0, 0.0,
+        // Back face
+        0.0, 2.0, 0.0,  0.0, 0.45, 0.45,
+        s, 0.0, s,     0.0, 1.0, 0.0,
+        -s, 0.0, s,    0.0, 1.0, 0.0,
+        // Left face
+        0.0, 2.0, 0.0, -0.45, 0.45, 0.0,
+        -s, 0.0, s,    0.0, 1.0, 0.0,
+        -s, 0.0, -s,   0.0, 1.0, 0.0,
+        // Top face (smaller)
+        0.0, 2.5, 0.0,  0.0, 1.0, 0.0,
+        -s*0.5, 0.0, -s*0.5,  0.0, 1.0, 0.0,
+        s*0.5, 0.0, -s*0.5,   0.0, 1.0, 0.0,
+        // Bottom face (larger)
+        0.0, 0.0, 0.0,   0.0, 1.0, 0.0,
+        -s*0.7, 0.0, -s*0.7,  0.0, 1.0, 0.0,
+        s*0.7, 0.0, -s*0.7,   0.0, 1.0, 0.0,
+    ];
+
+    let buffer = gl.create_buffer().unwrap();
+    gl.bind_buffer(WebGl2RenderingContext::ARRAY_BUFFER, Some(&buffer));
+    gl.buffer_data_with_array_buffer_view(
+        WebGl2RenderingContext::ARRAY_BUFFER,
+        &Float32Array::from(&vertices[..]),
+        WebGl2RenderingContext::STATIC_DRAW,
+    );
+
+    gl.enable_vertex_attrib_array(0);
+    gl.vertex_attrib_pointer_with_i32(0, 3, WebGl2RenderingContext::FLOAT, false, 6 * 4, 0);
+    gl.enable_vertex_attrib_array(1);
+    gl.vertex_attrib_pointer_with_i32(1, 3, WebGl2RenderingContext::FLOAT, false, 6 * 4, 3 * 4);
+
+    gl.bind_vertex_array(None);
+    Ok(vao)
+}
