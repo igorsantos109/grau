@@ -40,6 +40,8 @@ Abra **http://127.0.0.1:8899**, clique em **JOGAR** (inicia o áudio — navegad
 ## ✨ Funcionalidades
 
 - Física de moto com wheelie (sustentação, ângulo crítico, force reverse), drift e zerinho
+- **Circuito de checkpoints**: 5 checkpoints em anel com marcadores visuais (cones 3D coloridos)
+- Sistema de volta (?autotest=lap): cruzar checkpoints em ordem, loga [GRAU][LAP] COMPLETED com tempo
 - 5 modos de câmera (terceira pessoa, primeira, capô, cinemática, drone)
 - Renderer WebGL2 com shaders próprios: moto procedural, chão infinito com grid, skybox procedural
 - HUD em HTML/CSS: velocidade, RPM, marcha, ângulo/tempo de grau, recordes, distância, FPS, barras de input
@@ -61,6 +63,7 @@ Abra **http://127.0.0.1:8899**, clique em **JOGAR** (inicia o áudio — navegad
 ```bash
 ./scripts/smoke_test.sh 8899    # build + serve + Chrome headless: valida que o WASM inicia sem erro
 ./scripts/autotest.sh 8899      # abre ?autotest=1: simula input e prova que a moto acelera (PASS)
+./scripts/autotest_lap.sh 8899  # abre ?autotest=lap: testa circuito de checkpoints e volta (PASS)
 ```
 
 - `cargo check --target wasm32-unknown-unknown` → **0 warnings, 0 erros**
