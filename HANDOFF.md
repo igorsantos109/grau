@@ -1,6 +1,6 @@
 # HANDOFF — grau-web
 
-Última atualização: 2026-11-18 20:36 -03 (P05-F5: commit local do circuito de checkpoints, sem push)
+Última atualização: 2026-11-18 22:30 -03 (P05-F6: marcadores visuais 3D dos checkpoints implementados e commitado)
 
 ## Objetivo
 Protótipo jogável web (Rust→WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie),
@@ -32,7 +32,7 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - P02 Vertical slice: CONCLUÍDO (start screen, HUD, pausa, recordes, autotest)
 - P03 Testes automatizados: CONCLUÍDO (smoke_test.sh + autotest.sh headless PASS)
 - P04 Documentação + publish: CONCLUÍDO (README reescrito PT-BR, HANDOFF, push p/ GitHub)
-- P05 Circuito com checkpoints/cones: EM ANDAMENTO — regra de volta (5 checkpoints em anel) + `?autotest=lap` funcionando; marcadores visuais (cones/cilindros 3D) pendentes
+- P05 Circuito com checkpoints/cones: CONCLUÍDO — regra de volta (5 checkpoints em anel) + `?autotest=lap` funcionando; marcadores visuais (cones/cilindros 3D) implementados
 - P06 Dano visual no HUD, game feel (camera shake/FOV): PENDENTE
 - P07 Gamepad, obstáculos, cenário com prédios: PENDENTE
 
@@ -65,10 +65,15 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - Push para GitHub realizado com `gh`/token da conta igorsantos109 (escopo: repo grau).
 
 ## Próxima ação concreta
-P05-F6: revisão do commit local do circuito (ou P05: marcadores visuais 3D dos checkpoints — cones/cilindros no anel).
-Após cada push na main, o CI publica automaticamente a nova build no Pages.
-Ver `NEXT_ACTION.md`.
+P06: implementar indicador visual de dano no HUD (bike.damage) e melhorias de game feel (camera shake/FOV). Commits: 6654650 (CHANGELOG), 758cfc1 (README), 8fb30e1 (cones), 58aa5f0 (circuito lap).
 
 ## Reversão
 - Commits locais em `grau-web/`; `git revert <sha>` ou reset ao último commit verde.
 - Remote main pode ser revertido via GitHub se necessário.
+
+## Implementação P05-F6: Marcadores visuais 3D dos checkpoints
+- Adicionados shaders CONE_VERTEX_SHADER e CONE_FRAGMENT_SHADER
+- Função `create_cone_geometry()` para gerar geometria de cono (7 triângulos)
+- Função `render_checkpoints()` no Renderer para desenhar cones posicionados nos 5 checkpoints
+- Cones possuem cor laranja (RGB 255, 165, 0) com iluminação básica
+- Teste autotest_lap.sh PASS confirmando funcionamento
