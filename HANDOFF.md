@@ -1,0 +1,67 @@
+# HANDOFF — Grau (raiz)
+
+Última atualização: 2026-11-19 — G02-F1 (emenda de escopo do mundo aberto urbano)
+
+## Objetivo
+Fase G02-F1: emendar o escopo de "um quarteirão" para "dois quarteirões ligados por ruas, com
+pelo menos um cruzamento e duas rotas entre pontos de referência", no projecto Godot para Windows
+(jogo nativo), preservando o Grau Web (Rust/WASM) e o lançador Android.
+
+Critérios de conclusão desta fase:
+- [x] Planta em texto de dois quarteirões com um cruzamento e duas rotas entre PR
+- [x] Definição de como se prova a escolha de caminho e o regresso ao início na mesma cena
+- [x] Indicação de onde a moto entrará em fase posterior
+- [x] Estado Git, referências lidas e proposta registados
+- [x] Nenhuma edição de código, instalação ou publicação de artefactos de jogo
+
+## Restrições e configurações protegidas
+- **Grau Web preservado**: `grau-web/src/`, renderer WebGL2, HUD, áudio, testes headless e CI/CD
+  de GitHub Pages não são alterados por esta fase.
+- **Lançador Android preservado**: o APK de referência continua ignorado pelo git (`.gitignore`
+  da raiz: `projeto-grau-mod_1.6.5-an1.com.apk`).
+- **Sem cópia de GTA III**: mapa, personagens, marcas, arte e áudio originais; a referência é
+  apenas o registo de exploração urbana em terceira pessoa.
+- **Sem implementação nesta fase**: a planta e a prova são especificação.
+- Motor do mundo aberto: **Godot para Windows**, jogo nativo (não apenas lançador).
+- Registo do handoff: distinguir ação proposta, executada e verificada.
+
+## Plano e progresso por etapa
+- G02-F1 Emenda de escopo (dois quarteirões, rotas, prova): **CONCLUÍDO**
+- G02-F2 Motor Godot para Windows, cena urbana procedural: PENDENTE
+- G02-F3 Checkpoints de rota, indicador de rota, HUD urbano: PENDENTE
+- G02-F4 Autotest `?autotest=route` e validação interactiva: PENDENTE
+- G02-F5 Portal SP ↔ urbano e primeira entrada da moto: PENDENTE
+
+## Resultados e verificações
+- Proposta escrita em `docs/G02-F1-proposta-escopo.md`.
+- Estado Git verificado antes da entrega: `main`, working tree limpa, HEAD `6f5f1d6`,
+  sincronizado com `origin/main`.
+- Nenhum build/teste executado: a fase não altera código executável.
+
+## Ficheiros alterados e referências
+- `docs/G02-F1-proposta-escopo.md` (novo) — proposta completa da fase
+- `grau-web/BACKLOG.md` — entrada da fase G02-F1
+- `grau-web/HANDOFF.md` — registo da emenda de escopo
+- `HANDOFF.md` (raiz) — este registo
+
+## Operações em andamento
+- Push para `origin/main` EM ANDAMENTO (apenas documentação G02-F1).
+
+## Decisões e justificativas
+- A planta, o mecanismo de prova e a entrada da moto são especificação escrita, não código,
+  por a restrição explícita da fase ("não edite ficheiros, não implemente" na fase de análise
+  inicial; subsequentemente autorizada a registar a proposta no repositório).
+- O mecanismo de prova reutiliza padrões já existentes no código (`LAP_CHECKPOINTS`,
+  `checkpoints_crossed`, cones 3D em `render_checkpoints()`, autotests headless
+  `?autotest=1` / `?autotest=lap`), reduzindo risco de introduzir padrões paralelos.
+
+## Bloqueios, autorizações e seu âmbito
+- Nenhum bloqueio activo.
+- Autorização do utilizador: registar a proposta no repositório e enviar ao GitHub (`RUN`).
+
+## Próxima ação concreta
+- G02-F2: definir a cena urbana em Godot para Windows (dois quarteirões, Rua Central, Rua
+  Transversal, Rua Base, cruzamento X, SP/PR1/PR2) sobre a planta de G02-F1.
+
+## Reversão
+- `git revert <sha>` do commit de documentação, ou `git reset --hard 6f5f1d6`.

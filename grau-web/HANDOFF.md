@@ -1,6 +1,6 @@
 # HANDOFF — grau-web
 
-Última atualização: 2026-11-18 22:45 -03 (P06: dano no HUD + game feel implementados e verificados)
+Última atualização: 2026-11-19 14:30 -03 (G02-F1: proposta de emenda de escopo concluída)
 
 ## Objetivo
 Protótipo jogável web (Rust→WASM/WebGL2) de jogo de moto com manobra "grau" (wheelie),
@@ -35,6 +35,8 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - P05 Circuito com checkpoints/cones: CONCLUÍDO — regra de volta (5 checkpoints em anel) + `?autotest=lap` funcionando; marcadores visuais (cones/cilindros 3D) implementados
 - P06 Dano visual no HUD, game feel (camera shake/FOV): CONCLUÍDO — painel DAMAGE no HUD com cor/pulso, dano na física (impacto/tombamento/drift), camera shake em impacto, FOV dinâmico por velocidade; testes PASS
 - P07 Gamepad, obstáculos, cenário com prédios: PENDENTE
+- **G02-F1 Emenda de escopo (mundo aberto 2 quarteirões): CONCLUÍDA** — proposta textual, planta, provas de navegação, spawn da moto definidos
+- **G02-F2 Implementação do layout urbano: EM ANDAMENTO** — renderer (chão/ruas/prédios), waypoints, autoteste roundtrip
 
 ## Resultados e verificações
 - `cargo check --target wasm32-unknown-unknown`: 0 warnings/0 erros (reverificado 2026-11-18 22:40 após P06)
@@ -52,7 +54,7 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - Web: `public/index.html`
 
 ## Operações em andamento
-- Nenhuma. Build e testes estão verdes.
+- **G02-F2**: Iniciando implementação do layout urbano (ruas, prédios procedurais, waypoints PN/PG/BC/C1, autoteste roundtrip)
 
 ## Decisões e justificativas
 - Rust/WASM em vez de Unity: build reproduzível via terminal, sem editor no ambiente (D1)
@@ -65,7 +67,7 @@ HUD completo, testes headless automatizados, código com 0 warnings.
 - Push para GitHub realizado com `gh`/token da conta igorsantos109 (escopo: repo grau).
 
 ## Próxima ação concreta
-P07: Gamepad API, obstáculos, cenário com prédios procedurais. Commits até P06: 0884fc8 (handoff P05-F6), 6654650 (CHANGELOG), 758cfc1 (README), 8fb30e1 (cones), 58aa5f0 (circuito lap). P06 ainda não commitado.
+G02-F2-P01: Criar géometria procedural de ruas (plano XZ com textura de asfalto/faixas) + prédios low-poly (cubos escalonados) no renderer. Substituir chão infinito atual por malha urbana delimitada (2 quarteirões ~120x120m). Adicionar constantes de waypoints (PN, PG, BC, C1) em game.rs. Criar autoteste `?autotest=roundtrip`.
 
 ## Reversão
 - Commits locais em `grau-web/`; `git revert <sha>` ou reset ao último commit verde.
@@ -86,3 +88,10 @@ P07: Gamepad API, obstáculos, cenário com prédios procedurais. Commits até P
 - `camera.rs`: `add_shake` acumula intensidade; FOV dinâmico (+velocidade, −wheelie); decay por dt real
 - `renderer.rs`: cor da moto varia com `bike.damage`
 - Verificado: cargo check 0 warnings, smoke/autotest/lap todos PASS
+
+## Plano G02-F2 (esta fase)
+- **G02-F2-P01** (renderer): Chão urbano procedural (asfalto + faixas), prédios low-poly (cubos escalados), delimitação dos 2 quarteirões (~120x120m). Substituir `create_ground_geometry` + skybox estático por cena urbana.
+- **G02-F2-P02** (game.rs): Constantes `URBAN_WAYPOINTS` (PN, PG, BC, C1) + modo `roundtrip_mode` + autoteste `?autotest=roundtrip` que executa rota A (PG→C1→PN) e volta rota B (PN→C1→BC→C1→PG) sem reset.
+- **G02-F2-P03** (bike.rs): `reset()` posiciona em PG (0, 0.5, -60) heading norte (0 rad).
+- **G02-F2-P04** (testes): `scripts/autotest_roundtrip.sh` + validação `cargo check` + smoke test.
+- **G02-F2-P05** (docs): Atualizar README, BACKLOG, CHANGELOG, HANDOFF.
