@@ -1,1 +1,9 @@
 projeto-grau-mod_1.6.5-an1.com.apk
+target/
+Cargo.lock
+node_modules/
+dist/
+pkg/
+*.wasm
+public/grau_web.js
+public/grau_web_bg.wasm
