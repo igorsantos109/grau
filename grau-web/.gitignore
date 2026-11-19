@@ -1,0 +1,8 @@
+target/
+Cargo.lock
+node_modules/
+dist/
+pkg/
+*.wasm
+public/grau_web.js
+public/grau_web_bg.wasm

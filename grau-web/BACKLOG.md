@@ -1,0 +1,28 @@
+# BACKLOG — grau-web (priorizado)
+
+## Fase 0 — Estabilizar base (CONCLUÍDA)
+- [x] Validar runtime headless — smoke_test.sh PASS
+- [x] Teste automatizado mínimo (smoke_test.sh)
+- [x] Tela inicial com gesto de áudio (0 warnings autoplay)
+- [x] Validação interativa de input — autotest.sh PASS (?autotest=1, moto acelera)
+- [x] Limpar warnings de dead code + deps não usadas (0 warnings)
+- [ ] Criar HANDOFF.md na raiz de grau-web
+- [ ] Circuito com checkpoints/cones e placar de volta ← PRÓXIMO
+
+## Fase 1 — Vertical slice polido
+- [x] Pausa (ESC/P) com overlay
+- [x] Reset suave ao tombar + R manual
+- [x] Barras de input no HUD (throttle/freio/direção/indicadores)
+- [ ] Indicador visual de dano no HUD (bike.damage)
+- [ ] Game feel: camera shake em impacto, FOV dinâmico com velocidade
+
+## Fase 2 — Sistemas
+- [x] Recordes persistidos em localStorage
+- [ ] Placar/tempo de volta em circuito demarcado (cones/checkpoints)
+- [ ] Obstáculos procedural (cones, rampas)
+- [ ] Gamepad (Gamepad API)
+
+## Fase 3 — Conteúdo/Polish
+- [ ] Cenário com mais identidade (prédios low-poly procedurais, cercas)
+- [ ] Trilha procedural original (Web Audio)
+- [ ] Modo foto / replay curto
