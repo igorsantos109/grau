@@ -1,5 +1,15 @@
 # CHANGELOG — grau-web
 
+## 2026-11-18 22:30 — Iteração 7 (P05-F6: marcadores visuais de checkpoints)
+- feat: marcadores visuais 3D dos checkpoints (cones cilíndricos coloridos no circuito)
+- add: shaders CONE_VERTEX_SHADER e CONE_FRAGMENT_SHADER (iluminação simples)
+- add: função `create_cone_geometry()` para gerar geometria de cono (7 triângulos)
+- add: função `render_checkpoints()` no Renderer para desenhar cones posicionados nos 5 checkpoints
+- feat: sistema de volta (?autotest=lap) com checkpoints visualizados
+- test: autotest_lap.sh PASS — 5/5 checkpoints cruzados, [GRAU][LAP] COMPLETED
+- docs: README atualizado com circuito de checkpoints e autotest_lap.sh
+- docs: HANDOFF.md atualizado com progresso P05-F6
+
 ## 2026-11-17 18:46 — Iteração 6 (docs + publish + CI/CD)
 - docs: README reescrito em PT-BR com link do jogo online; HANDOFF.md criado
 - ci: `.github/workflows/build-and-deploy.yml` builda WASM e deploy automático no GitHub Pages
