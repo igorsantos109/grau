@@ -1,6 +1,6 @@
 # HANDOFF — Grau (raiz)
 
-Última atualização: 2026-11-19 — G02-F1 (emenda de escopo do mundo aberto urbano)
+Última atualização: 2026-11-20 — G02-F3 (checkpoints de rota, HUD urbano, round trip proof implementados)
 
 ## Objetivo
 Fase G02-F1: emendar o escopo de "um quarteirão" para "dois quarteirões ligados por ruas, com
@@ -28,7 +28,7 @@ Critérios de conclusão desta fase:
 ## Plano e progresso por etapa
 - G02-F1 Emenda de escopo (dois quarteirões, rotas, prova): **CONCLUÍDO**
 - G02-F2 Motor Godot para Windows, cena urbana procedural: **CONCLUÍDO (base jogável)**
-- G02-F3 Checkpoints de rota, indicador de rota, HUD urbano: PENDENTE
+- G02-F3 Checkpoints de rota, indicador de rota, HUD urbano: **CONCLUÍDO**
 - G02-F4 Autotest `?autotest=route` e validação interactiva: PENDENTE
 - G02-F5 Portal SP ↔ urbano e primeira entrada da moto: PENDENTE
 
@@ -40,8 +40,9 @@ Critérios de conclusão desta fase:
 - Player com câmera terceira pessoa, controles WASD + mouse, rodando no Godot 4.7.2.
 - Projeto carrega e roda sem erros no Godot (Vulkan, sem erros de parse).
 - Export Windows: NÃO VERIFICADO (templates de exportação não instalados; não baixados sem ordem específica).
-- Estado Git sincronizado com `origin/main` (HEAD `89f7f3b`).
-- Nenhum build/teste executado: a fase não altera código executável do Grau Web.
+- **G02-F3 implementado**: waypoints PN/PG/BC/C1 com detecção por raio, RouteManager com Rota A (PG→C1→PN) e Rota B (PN→C1→BC→C1→PG), HUD urbano com barra de progresso e label de rota, prova `ROUTE COMPLETED round_trip=true` ao completar round trip.
+- Estado Git sincronizado com `origin/main` (HEAD `363291e`).
+- Grau Web intacto: CI/CD GitHub Pages passa, autotests remotos PASS.
 
 ## Ficheiros alterados e referências
 - `docs/G02-F1-proposta-escopo.md` (novo) — proposta completa da fase
@@ -50,7 +51,7 @@ Critérios de conclusão desta fase:
 - `HANDOFF.md` (raiz) — este registo
 
 ## Operações em andamento
-- Nenhuma. Push para `origin/main` concluído (apenas documentação G02-F1).
+- Nenhuma. Push para `origin/main` concluído (G02-F1 documentação + G02-F2 base + G02-F3 waypoints/HUD/rotas).
 
 ## Decisões e justificativas
 - A planta, o mecanismo de prova e a entrada da moto são especificação escrita, não código,
@@ -65,8 +66,7 @@ Critérios de conclusão desta fase:
 - Autorização do utilizador: registar a proposta no repositório e enviar ao GitHub (`RUN`).
 
 ## Próxima ação concreta
-- G02-F3: checkpoints de rota (PN/PG/BC/C1), indicador de rota ativa no HUD, marcadores directionais.
-- G02-F4: autotest roundtrip (`?autotest=route` ou equivalente Godot) e validação interactiva da prova.
+- G02-F4: autotest roundtrip (script headless Godot equivalente a `?autotest=route`) e validação interactiva da prova.
 - G02-F5: portal SP ↔ urbano + primeira entrada da moto (depois de 3 voltas de treino no Grau Web).
 
 ## Reversão

@@ -38,6 +38,8 @@
       fase posterior (SP → portal urbano). **CONCLUÍDO (proposta; sem implementação)**
 - [x] **G02-F2** — Motor Godot para Windows: cena urbana com QT A / QT B, Rua Central, Rua Transversal,
       Rua Base, cruzamento X e marcadores SP / PR1 / PR2. **CONCLUÍDO (base jogável em `grau-godot/`)**
-- [ ] G02-F3 — Checkpoints de rota, indicador de rota ativa no HUD e marcadores direcionais
-- [ ] G02-F4 — Autotest de rota (`?autotest=route`) e validação interactiva da prova
+- [x] **G02-F3** — Checkpoints de rota (PN/PG/BC/C1), indicador de rota ativa no HUD (Rota A / Rota B),
+      marcadores directionais coloridos, RouteManager com sequências A/B, prova `ROUTE COMPLETED round_trip=true`.
+      **CONCLUÍDO (implementado em `grau-godot/`)**
+- [ ] G02-F4 — Autotest de rota (`?autotest=route` ou equivalente Godot) e validação interactiva da prova
 - [ ] G02-F5 — Portal SP ↔ urbano e primeira entrada da moto (depois de 3 voltas de treino)
