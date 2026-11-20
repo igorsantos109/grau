@@ -7,3 +7,6 @@ pkg/
 *.wasm
 public/grau_web.js
 public/grau_web_bg.wasm
+.godot/
+grau-godot/.godot/
+*.uid

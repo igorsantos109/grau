@@ -1,0 +1,36 @@
+config/name = "Grau Urbano"
+config/version = "0.1.0"
+rendering/quality/drivers/compatibility = true
+
+display/window/size/viewport_width = 1280
+display/window/size/viewport_height = 720
+display/window/size/window_width = 1280
+display/window/size/window_height = 720
+display/window/title = "Grau Urbano"
+
+input/camera_move = [{"device": 3, "axis": 2, "deadzone": 0.1}, {"device": 3, "axis": 3, "deadzone": 0.1}]
+input/camera_look = [{"device": 3, "axis": 0, "deadzone": 0.1}, {"device": 3, "axis": 1, "deadzone": 0.1}]
+input/ui_up = [{"key": 16777235}, {"key": 87}]
+input/ui_down = [{"key": 16777237}, {"key": 83}]
+input/ui_left = [{"key": 16777234}, {"key": 65}]
+input/ui_right = [{"key": 16777236}, {"key": 68}]
+input/ui_accept = [{"key": 32}]
+input/ui_cancel = [{"key": 8}, {"key": 27}]
+
+input/move_forward = [{"key": 16777235}, {"key": 87}]
+input/move_backward = [{"key": 16777237}, {"key": 83}]
+input/move_left = [{"key": 16777234}, {"key": 65}]
+input/move_right = [{"key": 16777236}, {"key": 68}]
+input/jump = [{"key": 32}]
+input/run = [{"key": 16777249}, {"key": 16777248}]
+
+input/camera_zoom_in = [{"key": 443}]
+input/camera_zoom_out = [{"key": 47}]
+
+application/run/main_scene = "res://scenes/main.tscn"
+
+[export]
+presets=[
+	{ "platform": "Windows Desktop", "name": "Windows Desktop", "runnable": true, "export_filter": "export/res/windows_export.zip", "custom_features": "", "exclude_filters": "", "include_filters": "[*.png,*.tscn,*.gd,*.tres]", "template_debug": "", "template_release": "", "texture_format_flags": 0, "video_driver": 0, "script_encryption_key": "" },
+	{ "platform": "Linux/X11", "name": "Linux/X11", "runnable": true, "export_filter": "export/res/linux_export.x86_64", "custom_features": "", "exclude_filters": "", "include_filters": "[*.png,*.tscn,*.gd,*.tres]", "template_debug": "", "template_release": "", "texture_format_flags": 0, "video_driver": 0, "script_encryption_key": "" }
+]

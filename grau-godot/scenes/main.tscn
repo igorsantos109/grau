@@ -1,0 +1,6 @@
+[gd_scene load_steps=1 format=3 id="1"]
+
+[node name="Main" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.61653, 4.80826, -9.61653)

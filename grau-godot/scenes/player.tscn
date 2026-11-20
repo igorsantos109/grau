@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 id="d4f3a9c1"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="2"]
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("2")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -132, 1, 132)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource(1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CameraPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource(2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+
+[sub_resource id="1" type="CapsuleShape3D"]
+radius = 0.4
+height = 1.8
+
+[sub_resource id="2" type="CapsuleMesh"]
+radius = 0.4
+height = 1.8

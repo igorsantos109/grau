@@ -27,16 +27,21 @@ Critérios de conclusão desta fase:
 
 ## Plano e progresso por etapa
 - G02-F1 Emenda de escopo (dois quarteirões, rotas, prova): **CONCLUÍDO**
-- G02-F2 Motor Godot para Windows, cena urbana procedural: PENDENTE
+- G02-F2 Motor Godot para Windows, cena urbana procedural: **CONCLUÍDO (base jogável)**
 - G02-F3 Checkpoints de rota, indicador de rota, HUD urbano: PENDENTE
 - G02-F4 Autotest `?autotest=route` e validação interactiva: PENDENTE
 - G02-F5 Portal SP ↔ urbano e primeira entrada da moto: PENDENTE
 
 ## Resultados e verificações
 - Proposta escrita em `docs/G02-F1-proposta-escopo.md`.
-- Estado Git verificado antes da entrega: `main`, working tree limpa, HEAD `dc01512`,
-  sincronizado com `origin/main`.
-- Nenhum build/teste executado: a fase não altera código executável.
+- Projeto Godot criado em `grau-godot/` (separado de `grau-web/`, preservando o Grau Web).
+- Cena urbana: 2 quarteirões (60×30 m cada), Rua Central (N-S), Rua Transversal (E-O), Rua Base (E-O), cruzamento X em (0,0,0).
+- Marcadores: SP=(-132,0.5,132) azul, PR1=(132,0.5,-132) verde, PR2=(132,0.5,132) vermelho, X=(0,0.5,0) amarelo.
+- Player com câmera terceira pessoa, controles WASD + mouse, rodando no Godot 4.7.2.
+- Projeto carrega e roda sem erros no Godot (Vulkan, sem erros de parse).
+- Export Windows: NÃO VERIFICADO (templates de exportação não instalados; não baixados sem ordem específica).
+- Estado Git sincronizado com `origin/main` (HEAD `89f7f3b`).
+- Nenhum build/teste executado: a fase não altera código executável do Grau Web.
 
 ## Ficheiros alterados e referências
 - `docs/G02-F1-proposta-escopo.md` (novo) — proposta completa da fase
