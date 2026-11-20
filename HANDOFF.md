@@ -65,8 +65,9 @@ Critérios de conclusão desta fase:
 - Autorização do utilizador: registar a proposta no repositório e enviar ao GitHub (`RUN`).
 
 ## Próxima ação concreta
-- G02-F2: definir a cena urbana em Godot para Windows (dois quarteirões, Rua Central, Rua
-  Transversal, Rua Base, cruzamento X, SP/PR1/PR2) sobre a planta de G02-F1.
+- G02-F3: checkpoints de rota (PN/PG/BC/C1), indicador de rota ativa no HUD, marcadores directionais.
+- G02-F4: autotest roundtrip (`?autotest=route` ou equivalente Godot) e validação interactiva da prova.
+- G02-F5: portal SP ↔ urbano + primeira entrada da moto (depois de 3 voltas de treino no Grau Web).
 
 ## Reversão
-- `git revert <sha>` do commit de documentação, ou `git reset --hard dc01512`.
+- `git revert <sha>` do commit de documentação, ou `git reset --hard 89f7f3b`.

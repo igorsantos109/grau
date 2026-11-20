@@ -1,5 +1,20 @@
 # CHANGELOG — grau-web
 
+## 2026-11-19 — G02-F2: base urbana Godot (2 quarteirões, ruas, cruzamento X, player 3ª pessoa)
+- feat: projecto Godot `grau-godot/` criado (separado de `grau-web/`, preserva Grau Web)
+- feat: cena urbana procedural — 2 quarteirões (60×30 m), Rua Central N-S, Rua Transversal E-O, Rua Base E-O
+- feat: cruzamento X em (0,0,0) ligando as 3 ruas
+- feat: marcadores SP/PR1/PR2/X (Marker3D coloridos: azul/verde/vermelho/amarelo)
+- feat: player terceira pessoa (CharacterBody3D + Camera3D), controles WASD + mouse capture
+- feat: ruas (asfalto), prédios (BoxMesh low-poly), chão (plano grama)
+- build: projecto carrega e roda no Godot 4.7.2 sem erros de parse
+
+## 2026-11-19 — G02-F1: emenda de escopo (mundo aberto urbano 2 quarteirões)
+- docs: `docs/G02-F1-proposta-escopo.md` — planta texto, rotas SP↔PR1 (Rota A norte, Rota B sul), cruzamento X
+- docs: prova de escolha/regresso na mesma cena (checkpoints directionais, `ROUTE COMPLETED round_trip=true`)
+- docs: entrada da moto em G02-F5 via SP (tecla U / botão CIDADE após 3 voltas de treino)
+- docs: `grau-web/BACKLOG.md` e `HANDOFF.md` atualizados com fase G02
+
 ## 2026-11-18 22:45 — Iteração 8 (P06: dano no HUD + game feel)
 - feat: painel DAMAGE no HUD (porcentagem, aparece só com dano > 0, esconde em 0%)
 - feat: cor dinâmica do dano (laranja → vermelho) e pulso crítico ≥75% (CSS `damage-critical`)

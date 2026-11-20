@@ -36,8 +36,8 @@
       cruzamento e duas rotas entre pontos de referência"; planta em texto, critério de prova de
       escolha de caminho/ regresso ao ponto inicial na mesma cena, e ponto de entrada da moto em
       fase posterior (SP → portal urbano). **CONCLUÍDO (proposta; sem implementação)**
-- [ ] G02-F2 — Motor Godot para Windows: cena urbana com QT A / QT B, Rua Central, Rua Transversal,
-      Rua Base, cruzamento X e marcadores SP / PR1 / PR2
+- [x] **G02-F2** — Motor Godot para Windows: cena urbana com QT A / QT B, Rua Central, Rua Transversal,
+      Rua Base, cruzamento X e marcadores SP / PR1 / PR2. **CONCLUÍDO (base jogável em `grau-godot/`)**
 - [ ] G02-F3 — Checkpoints de rota, indicador de rota ativa no HUD e marcadores direcionais
 - [ ] G02-F4 — Autotest de rota (`?autotest=route`) e validação interactiva da prova
 - [ ] G02-F5 — Portal SP ↔ urbano e primeira entrada da moto (depois de 3 voltas de treino)
