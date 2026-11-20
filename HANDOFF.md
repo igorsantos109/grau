@@ -46,7 +46,7 @@ Critérios de conclusão desta fase:
 - `HANDOFF.md` (raiz) — este registo
 
 ## Operações em andamento
-- Push para `origin/main` EM ANDAMENTO (apenas documentação G02-F1).
+- Nenhuma. Push para `origin/main` concluído (apenas documentação G02-F1).
 
 ## Decisões e justificativas
 - A planta, o mecanismo de prova e a entrada da moto são especificação escrita, não código,
